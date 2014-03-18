@@ -1110,7 +1110,10 @@ HTTP2-Settings    = token68
                 <vspace blankLines="0"/>
                 A stream in the "open" state may be used by both peers to send frames of any type.
                 In this state, sending peers observe advertised <xref target="FlowControl">stream
-                level flow control limits</xref>.
+                level flow control limits
+
+                处于“打开”状态的流可以被两个对等端来发送任何类型的帧。在这种状态下，发送数据的对等端检查被广播端<xref target="FlowControl">流量控制限制。
+                </xref>.
               </t>
               <t>
                 From this state either endpoint can send a frame with an END_STREAM flag set, which
@@ -1119,10 +1122,14 @@ HTTP2-Settings    = token68
                 endpoint receiving an END_STREAM flag causes the stream state to become "half closed
                 (remote)".  A <x:ref>HEADERS</x:ref> frame bearing an END_STREAM flag can be followed
                 by <x:ref>CONTINUATION</x:ref> frames.
+
+                在这种状态下每个终端可以发送一个带有END_STREAM结束流标记的帧来使流转换到以下一种“半关闭”状态：一个终端发送一个结束流END_STREAM标记使流变成“半封闭”状态；一个终端接收一个结束流END_STREAM标记使流变成“半封闭(远程)”状态。带有结束流END_STREAM标记的<x:ref>报头HEADERS</x:ref>帧后面可以跟着<x:ref>延续CONTINUATION</x:ref>帧。 
               </t>
               <t>
                 Either endpoint can send a <x:ref>RST_STREAM</x:ref> frame from this state, causing it
                 to transition immediately to "closed".
+
+                这种状态下各个终端可以发送一个<x:ref>RST_STREAM</x:ref>帧来使流转换到"关闭"状态。
               </t>
             </x:lt>
 
@@ -1130,17 +1137,23 @@ HTTP2-Settings    = token68
               <t>
                 <vspace blankLines="0"/>
                 A stream that is in the "half closed (local)" state cannot be used for sending frames.
+
+                “半封闭(本地)”状态下的流不能发送帧。
               </t>
               <t>
                 A stream transitions from this state to "closed" when a frame that contains an
                 END_STREAM flag is received, or when either peer sends a <x:ref>RST_STREAM</x:ref>
                 frame.  A <x:ref>HEADERS</x:ref> frame bearing an END_STREAM flag can be followed by
                 <x:ref>CONTINUATION</x:ref> frames.
+
+                这种状态下，当流接收到包含END_STREAM标记的帧或者某个终端发送了<x:ref>RST_STREAM</x:ref>帧，流转换到“关闭”状态。带有结束流END_STREAM标记的<x:ref>报头HEADERS</x:ref>帧后面可以跟着<x:ref>延续CONTINUATION</x:ref>帧。 
               </t>
               <t>
                 A receiver can ignore <x:ref>WINDOW_UPDATE</x:ref> or <x:ref>PRIORITY</x:ref> frames
                 in this state.  These frame types might arrive for a short period after a frame
                 bearing the END_STREAM flag is sent.
+
+                这种状态下接收端可以忽略<x:ref>窗口更新WINDOW_UPDATE</x:ref>或<x:ref>优先级PRIORITY</x:ref>帧。这种类型的帧有可能在结束流END_STREAM标记到达一小段时间后才收到。
               </t>
             </x:lt>
 
@@ -1150,16 +1163,22 @@ HTTP2-Settings    = token68
                 A stream that is "half closed (remote)" is no longer being used by the peer to send
                 frames.  In this state, an endpoint is no longer obligated to maintain a receiver
                 flow control window if it performs flow control.
+
+                "半封闭(远程)"状态下的流不再被对等端用来发送帧。这种状态下，执行流量控制的终端不在承担接收留空控制窗口的工作。
               </t>
               <t>
                 If an endpoint receives additional frames for a stream that is in this state, other
                 than <x:ref>CONTINUATION</x:ref> frames, it MUST respond with a <xref
                 target="StreamErrorHandler">stream error</xref> of type
                 <x:ref>STREAM_CLOSED</x:ref>.
+
+                如果终端接收到处于这种状态下的流发送的额外的帧，除非是<x:ref>延续CONTINUATION</x:ref>帧，否则必须返回类型为<x:ref>流关闭STREAM_CLOSED</x:ref>的<xref target="StreamErrorHandler">流错误</xref>
               </t>
               <t>
                 A stream can transition from this state to "closed" by sending a frame that contains
                 an END_STREAM flag, or when either peer sends a <x:ref>RST_STREAM</x:ref> frame.
+
+                这种状态下，当流发送一个带有终止流END_STREAM标记的帧或者某个终端发送了一个<x:ref>RST_STREAM</x:ref>帧，流将转换到“关闭”状态。
               </t>
             </x:lt>
 
@@ -1167,6 +1186,8 @@ HTTP2-Settings    = token68
               <t>
                 <vspace blankLines="0"/>
                 The "closed" state is the terminal state.
+
+                “关闭”状态是终止状态。
               </t>
               <t>
                 An endpoint MUST NOT send frames on a closed stream.  An endpoint that receives any
@@ -1178,6 +1199,9 @@ HTTP2-Settings    = token68
                 frame with an END_STREAM flag set MUST treat that as a <xref
                 target="StreamErrorHandler">stream error</xref> of type
                 <x:ref>STREAM_CLOSED</x:ref>.
+
+                终端绝对不能通过关闭的流发送帧。终端在收到<x:ref>RST_STREAM</x:ref>后接收的任何帧必须作为类型为<x:ref>流关闭STREAM_CLOSED</x:ref>的<xref target="StreamErrorHandler">流错误stream error</xref>处理。相似的，终端接收到带有END_STREAM标记设置的<x:ref>数据DATA</x:ref>帧之后的任何帧，或在带有END_STREAM终止流标记且后面没有<x:ref>延续CONTINUATION</x:ref>帧的<x:ref>报头HEADERS</x:ref>帧之后收到任何帧都必须作为类型为<x:ref>流关闭STREAM_CLOSED</x:ref>的<xref
+                target="StreamErrorHandler">流错误</xref>处理。
               </t>
               <t>
                 <x:ref>WINDOW_UPDATE</x:ref>, <x:ref>PRIORITY</x:ref>, or <x:ref>RST_STREAM</x:ref>
@@ -1190,6 +1214,11 @@ HTTP2-Settings    = token68
                 arrive a significant time after sending END_STREAM as a <xref
                 target="ConnectionErrorHandler">connection error</xref> of type
                 <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                这种状态下，<x:ref>WINDOW_UPDATE</x:ref>, <x:ref>PRIORITY</x:ref>, or <x:ref>RST_STREAM</x:ref>帧可以在带有END_STREAM标记的<x:ref>数据DATA</x:ref>或者<x:ref>报头HEADERS</x:ref>帧发送一小段时间内被接收。在远端对等端接收并处理带有END_STREAM标记的帧之前，可以发送任意这几种帧。
+                在这种状态下终端必须忽略接收到的<x:ref>WINDOW_UPDATE</x:ref>, <x:ref>PRIORITY</x:ref>, 或 <x:ref>RST_STREAM</x:ref>帧，但终端也可以当作<x:ref>协议错误PROTOCOL_ERROR</x:ref>或者<xref
+                target="ConnectionErrorHandler">连接错误</xref>来处理。
+
               </t>
               <t>
                 If this state is reached as a result of sending a <x:ref>RST_STREAM</x:ref> frame,
@@ -1199,6 +1228,8 @@ HTTP2-Settings    = token68
                 <x:ref>RST_STREAM</x:ref> frame.  An endpoint MAY choose to limit the period over
                 which it ignores frames and treat frames that arrive after this time as being in
                 error.
+
+                如果流在发送<x:ref>RST_STREAM</x:ref>帧转换到这种状态，接收到<x:ref>RST_STREAM</x:ref>的对等端可能已经发送或者队列中准备发送无法取消的帧。终端必须忽略从已经发送<x:ref>RST_STREAM</x:ref>帧的流接收到的帧。终端可以选择设置忽略帧的超时时间并在超过限制后作为错误处理。
               </t>
               <t>
                 Flow controlled frames (i.e., <x:ref>DATA</x:ref>) received after sending
@@ -1206,12 +1237,16 @@ HTTP2-Settings    = token68
                 Even though these frames might be ignored, because they are sent before the sender
                 receives the <x:ref>RST_STREAM</x:ref>, the sender will consider the frames to count
                 against the flow control window.
+
+                在发送<x:ref>RST_STREAM</x:ref>之后收到的流量受限帧(如<x:ref>数据DATA</x:ref>帧)转向流量控制窗口连接处理。尽管这些帧可以被忽略，但他们是在发送端接收到<x:ref>RST_STREAM</x:ref>之前发送的，发送端会认为这些帧与流量控制窗口不符。
               </t>
               <t>
                 An endpoint might receive a <x:ref>PUSH_PROMISE</x:ref> frame after it sends
                 <x:ref>RST_STREAM</x:ref>.  <x:ref>PUSH_PROMISE</x:ref> causes a stream to become
                 "reserved" even if the associated stream has been reset.  Therefore, a
                 <x:ref>RST_STREAM</x:ref> is needed to close an unwanted promised streams.
+
+                终端可能在发送<x:ref>RST_STREAM</x:ref>之后收到<x:ref>PUSH_PROMISE</x:ref>帧。即便相关的流已经被重置，<x:ref>PUSH_PROMISE</x:ref>也能使流变成“预留”状态。因此，需要<x:ref>RST_STREAM</x:ref>来关闭一个不想要的被承诺流。
               </t>
             </x:lt>
           </list>
@@ -1221,6 +1256,8 @@ HTTP2-Settings    = token68
           SHOULD treat the receipt of a message that is not expressly permitted in the description
           of a state as a <xref target="ConnectionErrorHandler">connection error</xref> of type
           <x:ref>PROTOCOL_ERROR</x:ref>.
+
+          本文档中没有明确说明的地方，具体实现时接收描述状态中没有明确许可的信息都应作为类型为<x:ref>协议错误PROTOCOL_ERROR</x:ref>的<xref target="ConnectionErrorHandler">连接错误</xref>来处理。
         </t>
 
         <section anchor="StreamIdentifiers" title="Stream Identifiers">
@@ -1230,12 +1267,16 @@ HTTP2-Settings    = token68
             even-numbered stream identifiers.  A stream identifier of zero (0x0) is used for
             connection control messages; the stream identifier zero MUST NOT be used to establish a
             new stream.
+
+            流由31位字节的无符号整数定义。客户端发起的流必须以奇数标示；服务器发起的流必须使用偶数来标示。0(0x0)用来标识连接控制信息流，且绝对不能用来建立一个新流。
           </t>
           <t>
             HTTP/1.1 requests that are upgraded to HTTP/2 (see <xref target="discover-http"/>) are
             responded to with a stream identifier of one (0x1).  After the upgrade
             completes, stream 0x1 is "half closed (local)" to the client.  Therefore, stream 0x1
             cannot be selected as a new stream identifier by a client that upgrades from HTTP/1.1.
+
+            HTTP/1.1升级到HTTP/2的请求将收到一个1(0x1)标识的响应流。升级完成后，0x1流将对客户端处于“半封闭(本地)”状态。因此，0x1流不能被从HTTP/1.1升级的客户端用来作为一个新的流的标识符。
           </t>
           <t>
             The identifier of a newly established stream MUST be numerically greater than all
@@ -1244,6 +1285,8 @@ HTTP2-Settings    = token68
             <x:ref>PUSH_PROMISE</x:ref>.  An endpoint that receives an unexpected stream identifier
             MUST respond with a <xref target="ConnectionErrorHandler">connection error</xref> of
             type <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            一个新建立的流标识符必须数值大于任何终端已经打开或者保留的流标识符。规则适用于使用<x:ref>HEADERS</x:ref>帧打开的流以及使用<x:ref>PUSH_PROMISE</x:ref>保留的流。终端收到不规范的流标识符必须响应一个类型为 <x:ref>PROTOCOL_ERROR</x:ref>的<xref target="ConnectionErrorHandler">连接错误connection error</xref>。
           </t>
           <t>
             The first use of a new stream identifier implicitly closes all streams in the "idle"
@@ -1251,11 +1294,15 @@ HTTP2-Settings    = token68
             For example, if a client sends a <x:ref>HEADERS</x:ref> frame on stream 7 without ever
             sending a frame on stream 5, then stream 5 transitions to the "closed" state when the
             first frame for stream 7 is sent or received.
+
+            新的流标识符第一次被使用时将隐式关闭所有处于“空闲”状态下，可能已经被对等端初始化而且流标识符数字小于新标识符的流。例如，一个客户端发送一个流7的<x:ref>HEADERS</x:ref>帧，那么在流7发送或者接收帧后从没有发送帧的流5将转换为“关闭”状态。
           </t>
           <t>
             Stream identifiers cannot be reused.  Long-lived connections can result in endpoint
             exhausting the available range of stream identifiers.  A client that is unable to
             establish a new stream identifier can establish a new connection for new streams.
+
+            流标识符不能被重复使用。生存期长的连接可能导致流标识符可用范围耗尽。客户端不能新建流标识符时可以针对新流建立一个新的连接。
           </t>
         </section>
 
@@ -1268,6 +1315,8 @@ HTTP2-Settings    = token68
             specify the maximum number of concurrent streams the server can initiate, and servers
             specify the maximum number of concurrent streams the client can initiate.  Endpoints
             MUST NOT exceed the limit set by their peer.
+
+            对等端可以使用<x:ref>SETTINGS</x:ref>帧里面的<x:ref>SETTINGS_MAX_CONCURRENT_STREAMS</x:ref>参数来限制流的并发量。最大并发流设置仅适用于终端并且只对接收到此设置的对等端有效。也就是说：客户端可以指定服务端能启动的流最大并发量，而且服务端能指定客户端能启动的流最大并发量。终端绝对不能超过对等端设置的限制。
           </t>
           <t>
             Streams that are in the "open" state, or either of the "half closed" states count toward
@@ -1275,9 +1324,13 @@ HTTP2-Settings    = token68
             these three states count toward the limit advertised in the
             <x:ref>SETTINGS_MAX_CONCURRENT_STREAMS</x:ref> setting (see <xref
             target="SettingValues"/>).
+
+            处于“打开”或者任意一种“半封闭”状态的流均计入终端被允许启动的流次数中。处于任意这三种状态下的流都将计入<x:ref>SETTINGS_MAX_CONCURRENT_STREAMS</x:ref> 设置次数中 (see <xref target="SettingValues"/>).
           </t>
           <t>
             Streams in either of the "reserved" states do not count as open.
+
+            处于任意一种“保留”状态下的流不计入打开次数中。
           </t>
         </section>
       </section>
@@ -1288,10 +1341,15 @@ HTTP2-Settings    = token68
           resulting in blocked streams.  A flow control scheme ensures that streams on the same
           connection do not destructively interfere with each other.  Flow control is used for both
           individual streams and for the connection as a whole.
+
+          使用复用流介绍了针对TCP连接的资源争夺导致了流的阻塞。流量控制方案等确保同意连接上的流相互之间不会造成破坏性的干扰。流量控制使用在单个流及整个连接过程中。
         </t>
         <t>
           HTTP/2 provides for flow control through use of the <x:ref>WINDOW_UPDATE</x:ref> frame
           type.
+
+          HTTP/2 通过使用<x:ref>WINDOW_UPDATE</x:ref>帧类型来提供流量控制。
+
         </t>
 
         <section anchor="fc-principles" title="Flow Control Principles">
@@ -1299,14 +1357,19 @@ HTTP2-Settings    = token68
             HTTP/2 stream flow control aims to allow for future improvements to flow control
             algorithms without requiring protocol changes.  Flow control in HTTP/2 has the following
             characteristics:
+
+            HTTP/2流流量控制目标在于允许不需要协议改动的情况下改进流量控制算法。HTTP/2中的流量控制有以下特点：
             <list style="numbers">
               <t>
                 Flow control is hop-by-hop, not end-to-end.
+                流量控制是逐跳的，而不是头尾连接的。
               </t>
               <t>
                 Flow control is based on window update frames.  Receivers advertise how many bytes
                 they are prepared to receive on a stream and for the entire connection.  This is a
                 credit-based scheme.
+
+                流量控制是基于窗口更新帧的。接收端广播自己准备在流及整个连接过程中接收的字节大小。这是一个信用为基础的方案。
               </t>
               <t>
                 Flow control is directional with overall control provided by the receiver.  A
@@ -1315,19 +1378,26 @@ HTTP2-Settings    = token68
                 receiver.  Clients, servers and intermediaries all independently advertise their
                 flow control window as a receiver and abide by the flow control limits set by
                 their peer when sending.
+
+                流量控制是有方向性的，由接收端全权掌握。接收端可以选择针对流及整个连接设置任意的窗口大小。发送端必须遵守接收端的流量控制限制。客户端、服务端及中端代理作为接收者时都独立的向外广播他们各自的流量控制窗口，作为发送者时遵守接收端的限制。
               </t>
               <t>
                 The initial value for the flow control window is 65,535 bytes for both new streams
                 and the overall connection.
+
+                每个新的流及整个连接的流量控制窗口初始值是65,535字节。
               </t>
               <t>
                 The frame type determines whether flow control applies to a frame.  Of the frames
                 specified in this document, only <x:ref>DATA</x:ref> frames are subject to flow
                 control; all other frame types do not consume space in the advertised flow control
                 window.  This ensures that important control frames are not blocked by flow control.
+
+                帧类型决定了是否适用流量控制规则。本文档定义的帧中，只有<x:ref>DATA</x:ref>帧受流量控制；所有其他的帧不受广播的流量控制窗口影响。这保证了重要的控制帧不因流量控制所阻塞。
               </t>
               <t>
                 Flow control cannot be disabled.
+                流量控制不能被禁用。
               </t>
               <t>
                 HTTP/2 standardizes only the format of the <x:ref>WINDOW_UPDATE</x:ref> frame (<xref
@@ -1335,6 +1405,9 @@ HTTP2-Settings    = token68
                 send this frame or the value that it sends.  Nor does it specify how a sender
                 chooses to send packets.  Implementations are able to select any algorithm that
                 suits their needs.
+
+                HTTP/2只标准化<x:ref>WINDOW_UPDATE</x:ref>帧格式(<xref target="WINDOW_UPDATE"/>)。它没有规定接收端是何时发送帧或者发送什么值，也没有规定发送端如何选择发送包。具体实现可以选择任何满足需求的算法。
+
               </t>
             </list>
           </t>
@@ -1343,6 +1416,8 @@ HTTP2-Settings    = token68
             based on priority; choosing how to avoid head of line blocking for requests; and
             managing the creation of new streams.  Algorithm choices for these could interact with
             any flow control algorithm.
+
+            具体实现还负责管理请求和响应是如何基于优先级发送的；如何避免请求头阻塞以及管理新流的创建。这些算法能够与任何流量控制算法相互作用。
           </t>
         </section>
 
@@ -1353,17 +1428,23 @@ HTTP2-Settings    = token68
             also might have a slow upstream connection and a fast downstream one.  Flow control
             addresses cases where the receiver is unable process data on one stream, yet wants to
             continue to process other streams in the same connection.
+
+            流量控制的定义是用来保护端点在资源约束条件下的操作。例如，一个代理需要在很多连接之间共享内存，也有可能有缓慢的上游连接和快速的下游连接。流量控制解决的情况是接收端在一个流上处理数据的同时同样想继续处理同个连接上的其他流。
           </t>
           <t>
             Deployments that do not require this capability can advertise a flow control window of
             the maximum size, incrementing the available space when new data is received. Sending
             data is always subject to the flow control window advertised by the receiver.
+
+            调度过程中不需要这种能力时可以广播一个最大值的流量控制窗口，增加接收新数据时的可用空间。发送数据时总是受接收端广播的流量控制窗口的管理。
           </t>
           <t>
             Deployments with constrained resources (for example, memory) MAY employ flow control to
             limit the amount of memory a peer can consume.  Note, however, that this can lead to
             suboptimal use of available network resources if flow control is enabled without
             knowledge of the bandwidth-delay product (see <xref target="RFC1323"/>).
+
+            资源约束下(例如内存)的调度可以使用流量来限制一个对等端可以消耗的内存数量。需要注意的是如果在不知道带宽延迟乘积的时候启用流量控制可能导致无法最优的利用可用的网络资源(see <xref target="RFC1323"/>)。
           </t>
           <t>
             Even with full awareness of the current bandwidth-delay product, implementation of flow
@@ -1372,6 +1453,8 @@ HTTP2-Settings    = token68
             critical frames, such as <x:ref>WINDOW_UPDATE</x:ref>, are not available to HTTP/2.
             However, flow control can ensure that constrained resources are protected without any
             reduction in connection utilization.
+
+            即便是对当前的网络延迟乘积有充分的认识，流量控制的实现也可能很复杂。当使用流量控制时，接收端必须及时地从TCP接收缓冲区读取数据。这样做可能导致在一些例如<x:ref>WINDOW_UPDATE</x:ref>的关键帧在HTTP/2不可用时导致死锁。但是流量控制可以保证约束资源能在不需要减少连接利用的情况下得到保护。
           </t>
         </section>
       </section>
@@ -1381,6 +1464,8 @@ HTTP2-Settings    = token68
           The endpoint establishing a new stream can assign a priority for the stream.  Priority is
           represented as an unsigned 31-bit integer.  0 represents the highest priority and
           2<x:sup>31</x:sup>-1 represents the lowest priority.
+
+          新建流的终端可以对流标记优先级。优先级使用31字节无符号整数表示。0表示最高优先级，2的31次方-1表示最低优先级。
         </t>
         <t>
           The purpose of this value is to allow an endpoint to express the relative priority of a
@@ -1389,44 +1474,62 @@ HTTP2-Settings    = token68
           when there is limited capacity for sending.  For instance, an endpoint might enqueue
           frames for all concurrently active streams.  As transmission capacity becomes available,
           frames from higher priority streams might be sent before lower priority streams.
+
+          这个值的目的是允许终端表示流的相对优先级。端点可以用这些信息按优先级来给流分配资源。HTTP/2中，当发送能力有限时，可以使用优先级来选择流传输帧。例如，终端可能对当前并发激活的流进行排队，当传输容量可用后，拥有高优先级的流可能在低优先级流前先发送帧。
         </t>
         <t>
           Explicitly setting the priority for a stream does not guarantee any particular processing
           or transmission order for the stream relative to any other stream. Nor is there any
           mechanism provided by which the initiator of a stream can force or require a receiving
           endpoint to process concurrent streams in a particular order.
+
+          明确设置流的优先级并不能保证能相当其他相关流有特殊的处理或者传输顺序。也没提供任何机制让流的发起者能强制或要求接收端对当前流进行特殊处理。
         </t>
         <t>
           Unless explicitly specified in the <x:ref>HEADERS</x:ref> frame (<xref target="HEADERS"/>)
           during stream creation, the default stream priority is 2<x:sup>30</x:sup>.
+
+          除非在<x:ref>HEADERS</x:ref>(<xref target="HEADERS"/>)帧中明确设置，默认的流优先级是2的三十次方。
         </t>
         <t>
           <xref target="PushResources">Pushed streams</xref> have a lower priority than their
           associated stream.  The promised stream inherits the priority value of the associated
           stream plus one, up to a maximum of 2<x:sup>31</x:sup>-1.
+
+          <xref target="PushResources">推送流</xref>比其他相关的流优先级低。被承诺的流继承了其相关的流优先级并加1，最多2<x:sup>31</x:sup>-1.
         </t>
       </section>
 
       <section title="Error Handling">
         <t>
           HTTP/2 framing permits two classes of error:
+
+          HTTP/2框架允许两类错误：
           <list style="symbols">
             <t>
               An error condition that renders the entire connection unusable is a connection error.
+
+              使整个连接不可用的错误。
             </t>
             <t>
               An error in an individual stream is a stream error.
+
+              单个流中出现的错误。
             </t>
           </list>
         </t>
         <t>
           A list of error codes is included in <xref target="ErrorCodes"/>.
+
+          错误码列表可以在<xref target="ErrorCodes"/>找到。
         </t>
 
         <section anchor="ConnectionErrorHandler" title="Connection Error Handling">
           <t>
             A connection error is any error which prevents further processing of the framing layer,
             or which corrupts any connection state.
+
+            流错误是阻止帧层更进一步进行处理或者破坏任何流状态的错误。
           </t>
           <t>
             An endpoint that encounters a connection error SHOULD first send a <x:ref>GOAWAY</x:ref>
@@ -1434,18 +1537,24 @@ HTTP2-Settings    = token68
             successfully received from its peer.  The <x:ref>GOAWAY</x:ref> frame includes an error
             code that indicates why the connection is terminating.  After sending the
             <x:ref>GOAWAY</x:ref> frame, the endpoint MUST close the TCP connection.
+
+            发送流错误的终端应当首先发送一个<x:ref>超时GOAWAY</x:ref>帧(<xref target="GOAWAY"/>)，并带有最近的一个成功从对等端接收帧的流的标识符。<x:ref>GOAWAY</x:ref>超时帧包含链接终端的错误码。发送<x:ref>GOAWAY</x:ref>后，终端必须关闭TCP连接。
           </t>
           <t>
             It is possible that the <x:ref>GOAWAY</x:ref> will not be reliably received by the
             receiving endpoint.  In the event of a connection error, <x:ref>GOAWAY</x:ref> only
             provides a best-effort attempt to communicate with the peer about why the connection is
             being terminated.
+
+            <x:ref>超时GOAWAY</x:ref>帧有可能不被接收端有效接收。在连接错误事件中，<x:ref>超时GOAWAY</x:ref>帧是尝试跟对等端通信告知连接终止原因的最佳实践。
           </t>
           <t>
             An endpoint can end a connection at any time.  In particular, an endpoint MAY choose to
             treat a stream error as a connection error.  Endpoints SHOULD send a
             <x:ref>GOAWAY</x:ref> frame when ending a connection, as long as circumstances permit
             it.
+
+            终端可以在任何时候终止一个连接。类似的，终端可以选择将流错误作为连接错误处理。只要环境许可，终端在终止连接时应当发送一个<x:ref>GOAWAY</x:ref>帧。
           </t>
         </section>
 
@@ -1453,12 +1562,17 @@ HTTP2-Settings    = token68
           <t>
             A stream error is an error related to a specific stream identifier that does not affect
             processing of other streams.
+
+            流错误是与特定标识的流相关的错误，并且不会影响其他流的处理。
           </t>
           <t>
             An endpoint that detects a stream error sends a <x:ref>RST_STREAM</x:ref> frame (<xref
             target="RST_STREAM"/>) that contains the stream identifier of the stream where the error
             occurred.  The <x:ref>RST_STREAM</x:ref> frame includes an error code that indicates the
             type of error.
+
+            终端检测到流错误时发送一个带有错误发生时的流标识符的<x:ref>RST_STREAM</x:ref>帧(<xref
+            target="RST_STREAM"/>)。<x:ref>RST_STREAM</x:ref>帧带有表示错误类型的错误码。
           </t>
           <t>
             A <x:ref>RST_STREAM</x:ref> is the last frame that an endpoint can send on a stream.
@@ -1466,16 +1580,22 @@ HTTP2-Settings    = token68
             frames that were sent or enqueued for sending by the remote peer.  These frames can be
             ignored, except where they modify connection state (such as the state maintained for
             <xref target="HeaderBlock">header compression</xref>).
+
+            <x:ref>RST_STREAM</x:ref>是终端可以发送一个流的最后一帧。发送<x:ref>RST_STREAM</x:ref>帧的对等端必须准备好接收任何由远端对等端发送或者准备发送的帧。这些帧可以被忽略，除非连接状态被修改（例如报头压缩中的状态）。
           </t>
           <t>
             Normally, an endpoint SHOULD NOT send more than one <x:ref>RST_STREAM</x:ref> frame for
             any stream. However, an endpoint MAY send additional <x:ref>RST_STREAM</x:ref> frames if
             it receives frames on a closed stream after more than a round-trip time.  This behavior
             is permitted to deal with misbehaving implementations.
+
+            通常，终端不应该在任何流觞发送多个<x:ref>RST_STREAM</x:ref>帧。但是，终端如果在一个关闭的流上超过rtt时间后收到帧，则可以发送的额外的<x:ref>RST_STREAM</x:ref>帧。这种做法是被允许用来处理这种非常规情况。
           </t>
           <t>
             An endpoint MUST NOT send a <x:ref>RST_STREAM</x:ref> in response to an
             <x:ref>RST_STREAM</x:ref> frame, to avoid looping.
+
+            终端绝不能在收到<x:ref>RST_STREAM</x:ref>帧后响应一个<x:ref>RST_STREAM</x:ref>帧，避免死循环。
           </t>
         </section>
 
@@ -1484,6 +1604,8 @@ HTTP2-Settings    = token68
             If the TCP connection is torn down while streams remain in open or half closed states,
             then the endpoint MUST assume that those streams were abnormally interrupted and could
             be incomplete.
+
+            如果TCP连接在流仍然保持打开或者半封闭状态下断开，那么终端必须假定这些流是异常终端且不完整的。
           </t>
         </section>
       </section>
@@ -1494,6 +1616,8 @@ HTTP2-Settings    = token68
           This specification defines a number of frame types, each identified by a unique 8-bit type
           code. Each frame type serves a distinct purpose either in the establishment and management
           of the connection as a whole, or of individual streams.
+
+          本规范定义了一系列的帧类型，每种类型由独特的8位类型代码标记。不管是在连接管理或单独的流中，每种帧都为了特定的目的而服务。
         </t>
         <t>
           The transmission of specific frame types can alter the state of a connection. If endpoints
@@ -1501,6 +1625,8 @@ HTTP2-Settings    = token68
           within the connection will no longer be possible. Therefore, it is important that
           endpoints have a shared comprehension of how the state is affected by the use any given
           frame.
+
+          特定帧类型的传输可以修改连接的状态。如果终端不能保持同步的连接状态，连接中的通信将失败。因此，终端对于如何使用给定帧修改状态需要达成共识。
         </t>
 
         <section anchor="DATA" title="DATA">
@@ -1508,10 +1634,14 @@ HTTP2-Settings    = token68
             DATA frames (type=0x0) convey arbitrary, variable-length sequences of octets associated
             with a stream. One or more DATA frames are used, for instance, to carry HTTP request or
             response payloads.
+
+            数据帧（类型=0x0）表示随意，由伴随流的可变长度序列组成。例如，一个或多个数据帧被用来携带HTTP请求或者响应的载体。
           </t>
           <t>
             DATA frames MAY also contain arbitrary padding.  Padding can be added to DATA frames to
             hide the size of messages.
+
+            数据帧也可以包含任意包装物。包装物可以添加到数据帧中来隐藏消息的大小。
           </t>
           <figure title="DATA Frame Payload">
             <artwork type="inline"><![CDATA[
@@ -1528,43 +1658,61 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The DATA frame contains the following fields:
+
+            数据帧包含以下字段：
             <list style="hanging">
               <t hangText="Pad High:">
                 An 8-bit field containing an amount of padding in units of 256 octets.  This field
                 is optional and is only present if the PAD_HIGH flag is set.  This field, in
                 combination with Pad Low, determines how much padding there is on a frame.
+
+                包含单位为256字节的填充量的8位字段。这个字段是可选的，并且只在设置了PAD_HIGH标记的情况下呈现。这个字段与Pad Low一起决定了帧上面有多少填充量。
               </t>
               <t hangText="Pad Low:">
                 An 8-bit field containing an amount of padding in units of single octets.  This
                 field is optional and is only present if the PAD_LOW flag is set.  This field, in
                 combination with Pad High, determines how much padding there is on a frame.
+
+                包含单位为单个字节的填充量的8为字段。这个字段是可选的并且只在设置了PAD_LOW标记的情况下呈现。这个字段与Pad High一起决定了帧上面有多少填充量。
               </t>
               <t hangText="Data:">
                 Application data.  The amount of data is the remainder of the frame payload after
                 subtracting the length of the other fields that are present.
+
+                应用数据。数据量的大小是帧的有效载荷减去其他呈现字段的长度。
               </t>
               <t hangText="Padding:">
                 Padding octets that contain no application semantic value.  Padding octets MUST be
                 set to zero when sending and ignored when receiving.
+
+                填充字节不包含任何应用语义值。天聪字节必须在发送的时候设置为0，在接受的时候忽略。
               </t>
             </list>
           </t>
 
           <t>
             The DATA frame defines the following flags:
+
+            数据帧定义了以下标记：
             <list style="hanging">
               <t hangText="END_STREAM (0x1):">
                 Bit 1 being set indicates that this frame is the last that the endpoint will send
                 for the identified stream.  Setting this flag causes the stream to enter one of
                 <xref target="StreamStates">the "half closed" states or the "closed" state</xref>.
+
+                1位用来表示当前帧是确定的流发送的最后一帧。设置这个标记时流进入到一种半封闭状态或者关闭状态。
               </t>
               <t hangText="END_SEGMENT (0x2):">
                 Bit 2 being set indicates that this frame is the last for the current segment.
                 Intermediaries MUST NOT coalesce frames across a segment boundary and MUST preserve
                 segment boundaries when forwarding frames.
+
+                2位表示是当前端的最后一帧。代理端绝对不能跨越多个端的边界来合并帧，转发帧的时候代理端必须保持片段的边界。
               </t>
               <t hangText="PAD_LOW (0x10):">
                 Bit 5 being set indicates that the Pad Low field is present.
+
+                5位用来表示Pad Low 字段是可见的。
               </t>
               <t hangText="PAD_HIGH (0x20):">
                 Bit 6 being set indicates that the Pad High field is present.  This bit MUST NOT be
@@ -1572,6 +1720,8 @@ HTTP2-Settings    = token68
                 PAD_HIGH set and PAD_LOW cleared MUST treat this as a <xref
                 target="ConnectionErrorHandler">connection error</xref> of type
                 <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                6位用来标识Pad High字段是可见的。除非设置了PAD_LOW标记才能设置此标记。终端接收到带有PAD_HIGH设置但是PAD_LOW被清除的必须作为类型为协议错误的连接错误来处理。
               </t>
             </list>
           </t>
@@ -1580,6 +1730,8 @@ HTTP2-Settings    = token68
             identifier field is 0x0, the recipient MUST respond with a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            数据帧绝对需要与流相关联。如果接收到流标记字段是0x0的数据帧，必须响应一个类型为协议错误的连接错误。
           </t>
           <t>
             DATA frames are subject to flow control and can only be sent when a stream is in the
@@ -1587,6 +1739,8 @@ HTTP2-Settings    = token68
             a DATA frame is received whose stream is not in "open" or "half closed (local)" state,
             the recipient MUST respond with a <xref target="StreamErrorHandler">stream error</xref>
             of type <x:ref>STREAM_CLOSED</x:ref>.
+
+            数据帧遵从流量控制，并且只有在流是打开或者半封闭(远端)状态下才能够被发送。填充同样包含在流量控制中。如果数据帧在相关流不是在打开和半封闭(本地)状态下被接收，接收端必须响应一个类型为流关闭的流错误。
           </t>
           <t>
             The total number of padding octets is determined by multiplying the value of the Pad
@@ -1595,16 +1749,23 @@ HTTP2-Settings    = token68
             the length of the remainder of the frame payload, the recipient MUST treat this as a
             <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            填充字节的总数由Pad High的值乘以256加上Pad Low 的值决定。二者默认值均为0。如果填充物的大小大于帧有效载荷的大小，接收端必须作为类型为协议错误的连接错误处理。
+
             <list style="hanging">
               <t hangText="Note:">
                 A frame can be increased in size by one octet by including a Pad Low field with a
                 value of zero.
+
+                加上值为0的Pad Low值后，帧大小将加1字节。
               </t>
             </list>
           </t>
           <t>
             Use of padding is a security feature; as such, its use demands some care, see <xref
             target="padding"/>.
+
+            使用填充是一种安全手段；例如，用来满足特定需求，见<xref target="padding"/>.
           </t>
         </section>
 
@@ -1613,6 +1774,8 @@ HTTP2-Settings    = token68
             The HEADERS frame (type=0x1) carries name-value pairs. It is used to <xref
             target="StreamStates">open a stream</xref>.  HEADERS frames can be sent on a stream in
             the "open" or "half closed (remote)" states.
+
+            报头帧(类型=0x1)由键值对组成。它用来打开一个流。报头帧能在流打开或者半封闭(远程)的状态下发送。
           </t>
           <figure title="HEADERS Frame Payload">
             <artwork type="inline"><![CDATA[
@@ -1631,32 +1794,49 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The HEADERS frame payload has the following fields:
+
+            报头帧主体有以下字段：
             <list style="hanging">
               <t hangText="Pad High:">
                 Padding size high bits.  This field is only present if the PAD_HIGH flag is set.
+
+                填充大小的高位。这个字段只有在设置了PAD_HIGH 标记的情况下才呈现。
+
               </t>
               <t hangText="Pad Low:">
                 Padding size low bits.  This field is only present if the PAD_LOW flag is set.
+
+                填充大小低位。这个字段只有在设置了PAD_LOW 标记的情况下才呈现。
               </t>
               <t hangText="X:">
                 A single reserved bit.  This field is optional and is only present if the PRIORITY
                 flag is set.
+
+                单一保留位。这个字段是可选的，并且只在优先级标记设置的情况下才呈现。
               </t>
               <t hangText="Priority:">
                 Prioritization information for the stream, see <xref target="StreamPriority"/>.
                 This field is optional and is only present if the PRIORITY flag is set.
+
+                流的优先级信息。见<xref target="StreamPriority"/>.这个字段是可选的，并且只在优先级标记设置的情况下才呈现。
               </t>
               <t hangText="Header Block Fragment:">
                 A <xref target="HeaderBlock">header block fragment</xref>.
+
+                报头块碎片。
               </t>
               <t hangText="Padding:">
                 Padding octets.
+
+                填充字节。
               </t>
             </list>
           </t>
 
           <t>
             The HEADERS frame defines the following flags:
+
+            报头帧定义了以下标记：
             <list style="hanging">
               <x:lt hangText="END_STREAM (0x1):">
                 <t>
@@ -1664,11 +1844,15 @@ HTTP2-Settings    = token68
                   is the last that the endpoint will send for the identified stream.  Setting this
                   flag causes the stream to enter one of <xref target="StreamStates">"half closed"
                   states</xref>.
+
+                  1位用来标识这是发送端对确定的流发送的最后报头区块。设置这个标记将使流进入一种半封闭状态。
                 </t>
                 <t>
                   A HEADERS frame that is followed by <x:ref>CONTINUATION</x:ref> frames carries the
                   END_STREAM flag that signals the end of a stream.  A <x:ref>CONTINUATION</x:ref>
                   frame cannot be used to terminate a stream.
+
+                  后面伴随带有END_STREAM标记的延续帧的报头帧表示流的终止。延续帧不用来用终止流。
                 </t>
               </x:lt>
               <x:lt hangText="END_SEGMENT (0x2):">
@@ -1676,6 +1860,8 @@ HTTP2-Settings    = token68
                   Bit 2 being set indicates that this frame is the last for the current segment.
                   Intermediaries MUST NOT coalesce frames across a segment boundary and MUST preserve
                   segment boundaries when forwarding frames.
+
+                  位2表示这是当前端的最后一帧。中介者绝对不能跨片段来合并帧，且在转发帧的时候必须保持片段的边界。
                 </t>
               </x:lt>
               <x:lt hangText="END_HEADERS (0x4):">
@@ -1683,6 +1869,8 @@ HTTP2-Settings    = token68
                   Bit 3 being set indicates that this frame contains an entire <xref
                   target="HeaderBlock">header block</xref> and is not followed by any
                   <x:ref>CONTINUATION</x:ref> frames.
+
+                  3 位表示帧包含了整个的报头块，且后面没有延续帧。
                 </t>
                 <t>
                   A HEADERS frame without the END_HEADERS flag set MUST be followed by a
@@ -1690,6 +1878,8 @@ HTTP2-Settings    = token68
                   receipt of any other type of frame or a frame on a different stream as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  不带有END_HEADERS标记的报头帧在同个流上后面必须跟着延续帧。接收端接收到任何其他类型的帧或者在其他流上的帧必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
               <x:lt hangText="PRIORITY (0x8):">
@@ -1697,11 +1887,15 @@ HTTP2-Settings    = token68
                   Bit 4 being set indicates that the frame contains a single reserved bit and a
                   31-bit priority; see <xref target="StreamPriority"/>. If this bit is not set,
                   those four bytes do not appear.
+
+                  4 位表示帧带有单独的保留为并且和一个31位的优先级。见<xref target="StreamPriority"/>.如果此为未设置，那四个字节不会出现。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_LOW (0x10):">
                 <t>
                   Bit 5 being set indicates that the Pad Low field is present.
+
+                  位5 表示Pad Low 字段会呈现。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_HIGH (0x20):">
@@ -1711,6 +1905,8 @@ HTTP2-Settings    = token68
                   PAD_HIGH set and PAD_LOW cleared MUST treat this as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  为6表示Pad High字段会呈现。除非PAD_LOW标记设置此标记才能设置。终端收到带有Pad High设置但是没有PAD_LOW标记的必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
             </list>
@@ -1720,6 +1916,8 @@ HTTP2-Settings    = token68
             The payload of a HEADERS frame contains a <xref target="HeaderBlock">header block
             fragment</xref>.  A header block that does not fit within a HEADERS frame is continued
             in a <xref target="CONTINUATION">CONTINUATION frame</xref>.
+
+            报头帧的主体包含一个报头区块碎片。报头区块大于一个报头帧的将在延续帧中继续传送。
           </t>
 
           <t>
@@ -1727,16 +1925,22 @@ HTTP2-Settings    = token68
             stream identifier field is 0x0, the recipient MUST respond with a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            报头帧必须与一个流相关联。如果一个接收到一个流标示识0x0得报头帧，接收端必须响应一个类型为协议错误的连接错误。
           </t>
 
           <t>
             The HEADERS frame changes the connection state as described in <xref
             target="HeaderBlock" />.
+
+            报头帧改变连接状态在此中表述。
           </t>
 
           <t>
             The HEADERS frame includes optional padding.  Padding fields and flags are identical to
             those defined for <xref target="DATA">DATA frames</xref>.
+
+            报头帧包含可选的填充段。填充字段和标记同数据帧中描述。
           </t>
         </section>
 
@@ -1745,6 +1949,8 @@ HTTP2-Settings    = token68
             The PRIORITY frame (type=0x2) specifies the sender-advised priority of a stream.  It can
             be sent at any time for an existing stream. This enables reprioritisation of existing
             streams.
+
+            优先级帧(type=0x2)明确了发送者建议的流的优先级。它可以任意时间在存在的流中发送。这个使存在的流有了优先级次序。
           </t>
           <figure title="PRIORITY Frame Payload">
             <artwork type="inline"><![CDATA[
@@ -1757,9 +1963,13 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The payload of a PRIORITY frame contains a single reserved bit and a 31-bit priority.
+
+            优先级帧的主体包含一个保留的位及31位的优先级。
           </t>
           <t>
             The PRIORITY frame does not define any flags.
+
+            优先级不定义任何标记。
           </t>
 
           <t>
@@ -1767,6 +1977,8 @@ HTTP2-Settings    = token68
             received with a stream identifier of 0x0, the recipient MUST respond with a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            优先级与存在的流相关联。如果接收端收到流标识为0的优先级帧，必须响应一个类型为协议错误的连接错误。
           </t>
           <t>
             The PRIORITY frame can be sent on a stream in any of the "reserved (remote)", "open",
@@ -1776,6 +1988,8 @@ HTTP2-Settings    = token68
             completed, which would cause it to have no effect.  For a stream that is in the "half
             closed (remote)" state, this frame can only affect processing of the stream and not
             frame transmission.
+
+            优先级帧可以在流状态为“保留(远端)”、“打开"、“半封闭(本地)”或者“半封闭(远程)”状态下发送,但它不能在由单个报头区块组成的连续帧之间发送。需要注意的是这个帧可能在处理或者帧发送已经完成之后才到达，这可能导致没有效果。对于处于“半封闭(远程)”状态下的流，优先级帧只能影响流的处理而不是传输。
           </t>
         </section>
 
@@ -1786,6 +2000,8 @@ HTTP2-Settings    = token68
             an error condition has occurred.  When sent by the receiver of a stream, it indicates
             that either the receiver is rejecting the stream, requesting that the stream be
             cancelled or that an error condition has occurred.
+
+            RST_STREAM帧(type=0x3)允许流的异常终止。当被流的指示器发送时，它表示期望取消流或者错误条件发生。当被接收端的流发送时，它表示接收者希望拒绝流、流被取消或者发生了错误。
           </t>
           <figure title="RST_STREAM Frame Payload">
             <artwork type="inline"><![CDATA[
@@ -1801,10 +2017,14 @@ HTTP2-Settings    = token68
             The RST_STREAM frame contains a single unsigned, 32-bit integer identifying the <xref
             target="ErrorCodes">error code</xref>.  The error code indicates why the stream is being
             terminated.
+
+            RST_STREAM 帧由一个无符号的32位整数标记错误码。错误码指明流被终止的原因。
           </t>
 
           <t>
             The RST_STREAM frame does not define any flags.
+
+            RST_STREAM 帧未定义任何标记。
           </t>
 
           <t>
@@ -1813,6 +2033,8 @@ HTTP2-Settings    = token68
             additional frames for that stream. However, after sending the RST_STREAM, the sending
             endpoint MUST be prepared to receive and process additional frames sent on the stream
             that might have been sent by the peer prior to the arrival of the RST_STREAM.
+
+            RST_STREAM 帧完全终止相关的流并使其转入关闭状态。在接收到流的RST_STREAM帧后，接收端绝对不能在流上发送额外的帧。然而，在发送RST_STREAM帧后，发送端必须要准备接收并处理流上的其他帧，因为对等端有可能在收到RST_STREAM帧前就已经发送。
           </t>
 
           <t>
@@ -1820,6 +2042,8 @@ HTTP2-Settings    = token68
             with a stream identifier of 0x0, the recipient MUST treat this as a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            RST_STREAM 帧必须与流相关联。如果接收端收到流标示符为0x0的RST_STREAM 帧，必须作为类型为协议错误的连接错误处理。
           </t>
 
           <t>
@@ -1827,6 +2051,8 @@ HTTP2-Settings    = token68
             frame identifying an idle stream is received, the recipient MUST treat this as a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            RST_STREAM帧绝对不能在流处于“空闲”状态下发送。如果接收端收到流状态为空闲的RST_STREAM帧，必须作为类型为协议错误的连接错误处理。
           </t>
 
         </section>
@@ -1837,18 +2063,25 @@ HTTP2-Settings    = token68
             constraints on peer behavior) that affect how endpoints communicate, and is also used
             to acknowledge the receipt of those parameters. Individually, a SETTINGS parameter can
             also be referred to as a "setting".
+
+            设置帧(type=0x4)包含影响如何与终端通信的设置参数(例如偏好设置以及对等端的行为约束)，并且用来确认这些参数的接收。单个的设置参数也可以被认为是“设置”。
           </t>
           <t>
             SETTINGS parameters are not negotiated; they describe characteristics of the sending
             peer, which are used by the receiving peer. Different values for the same parameter can
             be advertised by each peer. For example, a client might set a high initial flow control
             window, whereas a server might set a lower value to conserve resources.
+
+            设置参数不是通过协商确定的；它们描述发送端的特点，并被接收端使用。相同的参数对不同的对等端设置可能不同。例如，一个客户端可能设置一个较高的流量控制窗口，而服务器为了保存资源可能设置一个较低的值。
           </t>
 
           <t>
             A SETTINGS frame MUST be sent by both endpoints at the start of a connection, and MAY
             be sent at any other time by either endpoint over the lifetime of the connection.
             Implementations MUST support all of the parameters defined by this specification.
+
+            设置帧必须由两个终端在连接开始的时候发送，并且可以由各个终端在连接生存期的任意时间发送。
+            具体实现必须支持本规范定义的所有参数。
           </t>
 
           <t>
@@ -1857,10 +2090,14 @@ HTTP2-Settings    = token68
             SETTINGS frame does not need to maintain any state other than the current value of its
             parameters. Therefore, the value of a SETTINGS parameter is the last value that is seen
             by a receiver.
+
+            设置帧的所有参数将替换参数中现有值。参数由他们出现的顺序来处理，而且接收设置帧并不需要保存当前值以外的任何状态。因此，设置参数的值是接收端接收到的最后一个值。
           </t>
           <t>
             SETTINGS parameters are acknowledged by the receiving peer. To enable this, the SETTINGS
             frame defines the following flag:
+
+            设置参数是被接收端公认的。为了实现这个，设置帧定义了以下标记：
             <list style="hanging">
               <t hangText="ACK (0x1):">
                 Bit 1 being set indicates that this frame acknowledges receipt and application of
@@ -1870,6 +2107,8 @@ HTTP2-Settings    = token68
                 target="ConnectionErrorHandler">connection error</xref> of type
                 <x:ref>FRAME_SIZE_ERROR</x:ref>.  For more info, see <xref
                 target="SettingsSync">Settings Synchronization</xref>.
+
+                位1表示设置帧已被接收端接收并应用。如果这个位设置了，设置帧的载体必须为空。接收到字段长度不是0的带有ACK标记的设置帧必须作为类型为帧大小错误的连接错误处理。更多信息，见此。
               </t>
             </list>
           </t>
@@ -1879,17 +2118,23 @@ HTTP2-Settings    = token68
             whose stream identifier field is anything other than 0x0, the endpoint MUST respond with
             a <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            设置帧总是应用于连接，而不是一个单独的流。流的设置帧标识必须为0.如果终端接收到流设置帧标识不是0的设置帧，必须响应一个类型为协议错误的连接错误。
           </t>
           <t>
             The SETTINGS frame affects connection state.  A badly formed or incomplete SETTINGS
             frame MUST be treated as a <xref target="ConnectionErrorHandler">connection error</xref>
             of type <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            设置帧影响连接状态。格式错误或者未完成的设置帧必须作为类型为协议错误的连接错误处理。
           </t>
 
           <section title="SETTINGS Format" anchor="SettingFormat">
             <t>
               The payload of a SETTINGS frame consists of zero or more parameters, each consisting
               of an unsigned 8-bit identifier and an unsigned 32-bit value.
+
+              设置帧载体包含0个或多个参数，每个包含一个无符号的8位标识以及一个无符号的32位值。
             </t>
 
             <figure title="Setting Format">
@@ -1908,6 +2153,8 @@ HTTP2-Settings    = token68
           <section anchor="SettingValues" title="Defined SETTINGS Parameters">
             <t>
               The following parameters are defined:
+
+              定义了以下参数：
               <list style="hanging">
                 <x:lt hangText="SETTINGS_HEADER_TABLE_SIZE (1):" anchor="SETTINGS_HEADER_TABLE_SIZE">
                   <t>
@@ -1915,6 +2162,8 @@ HTTP2-Settings    = token68
                     header compression table used to decode header blocks. The encoder can reduce
                     this size by using signaling specific to the header compression format inside a
                     header block.  The initial value is 4,096 bytes.
+
+                    允许发送端通知远端终端解码报头区块的报头压缩表的大小。这个编码器可以在报头区块中使用特定信号来减少报头压缩的大小。初始值是4,096个字节。
                   </t>
                 </x:lt>
                 <x:lt hangText="SETTINGS_ENABLE_PUSH (2):" anchor="SETTINGS_ENABLE_PUSH">
@@ -1926,12 +2175,16 @@ HTTP2-Settings    = token68
                     <x:ref>PUSH_PROMISE</x:ref> frame as a <xref
                     target="ConnectionErrorHandler">connection error</xref> of type
                     <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                    这个参数可以用来关闭服务器推送。终端在接收到此参数为0的情况下绝对不能发送服务器推送帧。终端在已经设置此参数为0并且承认的情况下必须对接收到的服务器推送作为类型为协议错误的连接错误处理。
                   </t>
                   <t>
                     The initial value is 1, which indicates that push is permitted. Any value other
                     than 0 or 1 MUST be treated as a  <xref
                       target="ConnectionErrorHandler">connection error</xref> of type
                     <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                    初始值是1，表示推送是许可的。任何不是0或1的值必须作为类型为协议错误的连接错误处理。
                   </t>
                 </x:lt>
                 <x:lt hangText="SETTINGS_MAX_CONCURRENT_STREAMS (3):" anchor="SETTINGS_MAX_CONCURRENT_STREAMS">
@@ -1941,6 +2194,8 @@ HTTP2-Settings    = token68
                     permits the receiver to create. Initially there is no limit to this value.  It
                     is recommended that this value be no smaller than 100, so as to not
                     unnecessarily limit parallelism.
+
+                    标明发送者允许的最大并发流。此限制是定向的：它适用于发送端允许接收端创建的最大并发流的数量。初始化时这个值没有限制。建议值不要大于100,以免不必要的限制并行。
                   </t>
                   <t>
                     A value of 0 for SETTINGS_MAX_CONCURRENT_STREAMS SHOULD NOT be treated as
@@ -1948,21 +2203,29 @@ HTTP2-Settings    = token68
                     however this can also happen for any limit that is exhausted with active
                     streams.  Servers SHOULD only set a zero value for short durations; if a server
                     does not wish to accept requests, closing the connection could be preferable.
-                  </t>
+
+                    此设置为0的值不应该被终端认为是特殊的。0的值阻止了新的流的创建，另外它也适用于被激活的流用尽的任何限制。对于短连接不应该设置此参数为0；如果服务端不希望接收任何请求，最佳的做法是关闭连接。
+                   </t>
                 </x:lt>
                 <x:lt hangText="SETTINGS_INITIAL_WINDOW_SIZE (4):" anchor="SETTINGS_INITIAL_WINDOW_SIZE">
                   <t>
                     Indicates the sender's initial window size (in bytes) for stream level flow
                     control.  The initial value is 65,535.
+
+                    表示发送端对流层流量控制的初始窗口大小(字节单位)。初始值是65,535。
                   </t>
                   <t>
                     This setting affects the window size of all streams, including existing
                     streams, see <xref target="InitialWindowSize"/>.
+
+                    这个参数影响了所有流的窗口大小，包括现有的流。见<xref target="InitialWindowSize"/>.
                   </t>
                   <t>
                     Values above the maximum flow control window size of 2<x:sup>31</x:sup> - 1 MUST
                     be treated as a <xref target="ConnectionErrorHandler">connection error</xref> of
                     type <x:ref>FLOW_CONTROL_ERROR</x:ref>.
+
+                    流量控制窗口大小值大于2的31次方-1的必须被作为流量控制错误的连接错误处理。
                   </t>
                 </x:lt>
               </list>
@@ -1971,6 +2234,8 @@ HTTP2-Settings    = token68
               An endpoint that receives a SETTINGS frame with any other identifier MUST
               treat this as a <xref target="ConnectionErrorHandler">connection error</xref> of type
               <x:ref>PROTOCOL_ERROR</x:ref>.
+
+              终端收到其他标记的设置帧必须作为类型为协议错误的连接错误处理。
             </t>
           </section>
 
@@ -1981,6 +2246,8 @@ HTTP2-Settings    = token68
               provide such synchronization timepoints, the recipient of a SETTINGS frame in which
               the ACK flag is not set MUST apply the updated parameters as soon as possible upon
               receipt.
+
+              大部分设置值收益于或者需要了解对等端接收到并且改变了通信过的参数的值的时机。为了提供这样一种同步的时间点，接收到没有设置ACK标记的设置帧必须尽快将更新过的参数适用于接收端上。
             </t>
             <t>
               The values in the SETTINGS frame MUST be applied in the order they appear, with no
@@ -1988,12 +2255,16 @@ HTTP2-Settings    = token68
               recipient MUST immediately emit a SETTINGS frame with the ACK flag set. Upon
               receiving a SETTINGS frame with the ACK flag set, the sender of the altered parameters
               can rely upon their application.
+
+              设置帧的值必须按照它们出现的顺序被使用，在处理值中间不能处理其他帧。一旦所有的值被应用，接收端必须马上发送一个带有ACK标记的设置帧。在接收到带有ACK标记的设置帧后，修改参数的发送端可以认为修改已生效。
             </t>
             <t>
               If the sender of a SETTINGS frame does not receive an acknowledgement within a
               reasonable amount of time, it MAY issue a <xref
               target="ConnectionErrorHandler">connection error</xref> of type
               <x:ref>SETTINGS_TIMEOUT</x:ref>.
+
+              如果设置参数的发送端没有在一定时间内收到认可的响应，它可以发出一个类型为设置超时的连接错误。
             </t>
           </section>
         </section>
@@ -2005,10 +2276,14 @@ HTTP2-Settings    = token68
             31-bit identifier of the stream the endpoint plans to create along with a set of
             headers that provide additional context for the stream.  <xref target="PushResources"/>
             contains a thorough description of the use of PUSH_PROMISE frames.
+
+            推送帧(type=0x5)用来在流发送者准备发送流之前告知对等端。推送帧包含了终端准备创建的长流的31位无符号标记以及提供附加上下文的报头的集合。<xref target="PushResources"/>中详细描述了推送帧的使用。
           </t>
           <t>
             PUSH_PROMISE MUST NOT be sent if the <x:ref>SETTINGS_ENABLE_PUSH</x:ref> setting of the
             peer endpoint is set to 0.
+
+            如果SETTINGS_ENABLE_PUSH设置参数为0，推送帧绝对不能被发送。
           </t>
 
           <figure title="PUSH_PROMISE Payload Format">
@@ -2028,40 +2303,58 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The HEADERS frame payload has the following fields:
+
+            报头帧载体包含以下字段：
             <list style="hanging">
               <t hangText="Pad High:">
                 Padding size high bits.  This field is only present if the PAD_HIGH flag is set.
+
+                填充大小高位。这个字段只有在PAD_HIGH标记设置的情况下才呈现。
               </t>
               <t hangText="Pad Low:">
                 Padding size low bits.  This field is only present if the PAD_LOW flag is set.
+
+                填充大小低位。这个字段只有在PAD_LOW标记设置的情况下才呈现。
               </t>
               <t hangText="X:">
                 A single reserved bit.
+
+                单独的保留位。
               </t>
               <t hangText="Promised Stream ID:">
                 This unsigned 31-bit integer identifies the stream the endpoint intends to start
                 sending frames for.  The promised stream identifier MUST be a valid choice for the
                 next stream sent by the sender (see <xref target="StreamIdentifiers">new stream
                 identifier</xref>).
+
+                这个无符号31位整数表示终端准备发送的流标记。被承诺的流标记必须对发送端准备发送的下一个流来说是有效选择。
               </t>
               <t hangText="Header Block Fragment:">
                 A <xref target="HeaderBlock">header block fragment</xref> containing request header
                 fields.
+
+                包含请求头字段的报头区块碎片。
               </t>
               <t hangText="Padding:">
                 Padding octets.
+
+                填充字节。
               </t>
             </list>
           </t>
 
           <t>
             The PUSH_PROMISE frame defines the following flags:
+
+            推送帧定义了以下标记：
             <list style="hanging">
               <x:lt hangText="END_HEADERS (0x4):">
                 <t>
                   Bit 3 being set indicates that this frame contains an entire <xref
                   target="HeaderBlock">header block</xref> and is not followed by any
                   <x:ref>CONTINUATION</x:ref> frames.
+
+                  位3 表明帧包含了整个报头区块并且不跟着延续帧。
                 </t>
                 <t>
                   A PUSH_PROMISE frame without the END_HEADERS flag set MUST be followed by a
@@ -2069,11 +2362,15 @@ HTTP2-Settings    = token68
                   other type of frame or a frame on a different stream as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  不带有END_HEADERS标记的推送承诺帧在同个流上面后面必须跟着延续帧。接收端接收到任何其他类型或者其他流觞的帧必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_LOW (0x10):">
                 <t>
                   Bit 5 being set indicates that the Pad Low field is present.
+
+                  位5 表明Pad Low字段是已设置。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_HIGH (0x20):">
@@ -2083,6 +2380,8 @@ HTTP2-Settings    = token68
                   PAD_HIGH set and PAD_LOW cleared MUST treat this as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  位6表明Pad High字段已设置。除非Pad High也设置了否则这个位绝对不能设置。终端接收到有PAD_HIGH 设置但是没有PAD_LOW设置的必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
             </list>
@@ -2093,22 +2392,30 @@ HTTP2-Settings    = token68
             stream identifier field specifies the value 0x0, a recipient MUST respond with a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            推送承诺帧必须与现有的由对等端初始化的流相关联。如果流标识字段为0x0，接收端必须响应一个类型为协议错误的连接错误。
           </t>
 
           <t>
             Promised streams are not required to be used in order promised.  The PUSH_PROMISE only
             reserves stream identifiers for later use.
+
+            被承诺的流并不需要以被承诺的顺序使用。推送承诺只保留接下来会使用的流的标识符。
           </t>
 
           <t>
             Recipients of PUSH_PROMISE frames can choose to reject promised streams by returning a
             <x:ref>RST_STREAM</x:ref> referencing the promised stream identifier back to the sender
             of the PUSH_PROMISE.
+
+            推送承诺的接收端可以选择给推送承诺的发送端返回一个与被承诺的流标识符相关的RST_STREAM标记来拒绝接收承诺流。
           </t>
 
           <t>
             The PUSH_PROMISE frame modifies the connection state as defined in <xref
             target="HeaderBlock" />.
+
+            推送承诺帧对连接章台的修改见HeaderBlock中定义。
           </t>
           <t>
             A PUSH_PROMISE frame modifies the connection state in two ways.  The inclusion of a
@@ -2118,6 +2425,8 @@ HTTP2-Settings    = token68
             that stream is either "open" or "half closed (remote)"; the sender MUST ensure that the
             promised stream is a valid choice for a <xref target="StreamIdentifiers">new stream
             identifier</xref> (that is, the promised stream MUST be in the "idle" state).
+
+            PUSH_PROMISE通过两种方式修改连接状态。这包括一个报头区块可能修改压缩状态。PUSH_PROMISE同样保留流后续使用，导致被推送的流进入到“保留”状态。发送端绝对不能在流上发送PUSH_PROMISE除非流是“打开”或者“半封闭(远程)”状态；发送端绝对要保证被承诺的流对于新的流标示来说是一个有效的选择(就是说，被承诺的流必须进入"空闲"状态)。
           </t>
           <t>
             Since PUSH_PROMISE reserves a stream, ignoring a PUSH_PROMISE frame causes the stream
@@ -2129,11 +2438,15 @@ HTTP2-Settings    = token68
             identifier</xref> (that is, an identifier for a stream that is not currently in the
             "idle" state) as a <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            由于PUSH_PROMISE保留了一个流、忽略一个PUSH_PROMISE 帧都会导致流状态变得不确定。接收端接收到流状态不是“打开”或者“半封闭(本地)”的流的推送帧必须作为类型为协议错误的连接错误处理。相似的，接收端必须对在一个非法标示的流(即流的标识当前不在空闲状态)上建立的推送承诺作为类型为协议错误的连接错误处理。
           </t>
 
           <t>
             The PUSH_PROMISE frame includes optional padding.  Padding fields and flags are
             identical to those defined for <xref target="DATA">DATA frames</xref>.
+
+            PUSH_PROMISE帧填充是可选的。填充字段及标记同数据帧中定义。
           </t>
         </section>
 
@@ -2142,6 +2455,8 @@ HTTP2-Settings    = token68
             The PING frame (type=0x6) is a mechanism for measuring a minimal round-trip time from
             the sender, as well as determining whether an idle connection is still functional.  PING
             frames can be sent from any endpoint.
+
+            PING帧(type=0x6)是一种从发送端测量最小的RTT时间的机制，同样也是一种检测连接是否可用的方法。PING帧可以被任何终端发送。
           </t>
           <figure title="PING Payload Format">
             <artwork type="inline"><![CDATA[
@@ -2158,20 +2473,28 @@ HTTP2-Settings    = token68
           <t>
             In addition to the frame header, PING frames MUST contain 8 octets of data in the
             payload.  A sender can include any value it chooses and use those bytes in any fashion.
+
+            除了帧报头之外，PING帧必须在载体中包含一个8字节长度的数据。发送端可以选择使用任何指并在任何时候使用。
           </t>
           <t>
             Receivers of a PING frame that does not include a ACK flag MUST send a PING frame with
             the ACK flag set in response, with an identical payload.  PING responses SHOULD be given
             higher priority than any other frame.
+
+            接收到不包含ACK标记的PING帧必须发送一个带有ACK比标记的PING帧响应，以及一个相同的载荷。PING响应应当设置比其他帧更高的优先级。
           </t>
 
           <t>
             The PING frame defines the following flags:
+
+            PING帧定义了以下标记：
             <list style="hanging">
               <t hangText="ACK (0x1):">
                 Bit 1 being set indicates that this PING frame is a PING response.  An endpoint MUST
                 set this flag in PING responses.  An endpoint MUST NOT respond to PING frames
                 containing this flag.
+
+                位1表示PING帧是一个PING响应。终端必须在PING响应中设置此标记。终端绝对不能对包含此标记的PING帧做出响应。
               </t>
             </list>
           </t>
@@ -2180,11 +2503,15 @@ HTTP2-Settings    = token68
             with a stream identifier field value other than 0x0, the recipient MUST respond with a
             <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            PING帧捕鱼任何独立的流相关联。如果收到流标示字段不是0x0的PING帧，接收端必须响应一个类型为协议错误的连接错误。
           </t>
           <t>
             Receipt of a PING frame with a length field value other than 8 MUST be treated as a
             <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>FRAME_SIZE_ERROR</x:ref>.
+
+            接收到字段长度不是8的PING帧必须作为类型为帧大小错误的连接错误处理。
           </t>
 
         </section>
@@ -2199,6 +2526,8 @@ HTTP2-Settings    = token68
             of this frame is to allow an endpoint to gracefully stop accepting new streams (perhaps
             for a reboot or maintenance), while still finishing processing of previously established
             streams.
+
+            超时帧(type=0x7)通知远端对等端不要在这个连接上建立新流。超时帧可以由客户端或者服务端发送。一旦发送，发动端将忽略当前连接上新的流的帧的发送。接收端接收到超时帧后绝对不能在这个连接上打开新的流，但是可以针对新的流创建一个新的连接。这个帧的目的是允许终端优雅的停止接收新的流(也许是重新启动或者维护)，但仍然接续完成之前已经建立的流的处理。
           </t>
           <t>
             There is an inherent race condition between an endpoint starting new streams and the
@@ -2208,6 +2537,8 @@ HTTP2-Settings    = token68
             indicated stream identifier, they were not processed by the sender and the receiver may
             treat the streams as though they had never been created at all (hence the receiver may
             want to re-create the streams later on a new connection).
+
+            在终端启动新的流及远端发送超时帧之间有一个内在的竞争条件。为了处理这种情况，超时帧带有当前连接中发送终端处理的最后一个流的标识。如果超时帧的接收端使用了比指定的流更新的流，它们将不会被发送端处理，而且接收端可以认为这些流根本没有被创建(因此接收端可以稍后在新的连接上重新创建这些流)。
           </t>
           <t>
             Endpoints SHOULD always send a GOAWAY frame before closing a connection so that the
@@ -2216,6 +2547,8 @@ HTTP2-Settings    = token68
             client cannot know if the server started to process that POST request if the server does
             not send a GOAWAY frame to indicate where it stopped working.  An endpoint might choose
             to close a connection without sending GOAWAY for misbehaving peers.
+
+            终端在关闭一个连接之前总是应当发送一个超时帧，这样远端就能知道一个流是否已被部分处理。例如，如果一个HTTP客户端在服务端关闭连接的时候发送了一个POST请求，如果服务端不发送一个指示它在哪里停止工作的超时帧，客户端将不知道这个POST请求是否被处理。对于不规范的对等端，终端可以选择不发送超时帧的情况下关闭连接。
           </t>
 
           <t>
@@ -2225,6 +2558,8 @@ HTTP2-Settings    = token68
             frames MUST be minimally processed to ensure a consistent compression state (see <xref
             target="HeaderBlock"/>); similarly DATA frames MUST be counted toward the connection
             flow control window.
+
+            发送超时帧后，发送端可以丢弃新流的帧。然而，任何改变连接状态的帧不能被完全忽略。例如，报头、PUSH_PROMISE和延续帧必须被最低限度的处理以确保一致的压缩状态(见HeaderBlock)；相似的数据帧必须被计入连接流量控制窗口。
           </t>
 
           <figure title="GOAWAY Payload Format">
@@ -2242,12 +2577,16 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The GOAWAY frame does not define any flags.
+
+            超时帧没有定义任何标记。
           </t>
           <t>
             The GOAWAY frame applies to the connection, not a specific stream.  An endpoint MUST
             treat a <x:ref>GOAWAY</x:ref> frame with a stream identifier other than 0x0 as a <xref
             target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            超时帧适用于连接而不是特定的流。终端接收到流标识符不是0x0的超时帧必须作为类型为协议错误的连接错误处理。
           </t>
           <t>
             The last stream identifier in the GOAWAY frame contains the highest numbered stream
@@ -2255,14 +2594,22 @@ HTTP2-Settings    = token68
             have taken some action on.  All streams up to and including the identified stream might
             have been processed in some way.  The last stream identifier is set to 0 if no streams
             were processed.
+
+            超时帧中最后一个流的标识包含了接收端接收到并可能已经进行某些处理的流的标识的最大值。所有小于或等于此指定标识符的流都可能通过某种方式被处理。如果没有流被处理，最后流的标识符设置为0。
+
+
             <list>
               <t>
                 Note: In this case, "processed" means that some data from the stream was passed to
                 some higher layer of software that might have taken some action as a result.
+
+                注意：这个案例中，“已处理”表示流中的某些数据已经被传到软件的更高的层并被进行某些处理。
               </t>
             </list>
             If a connection terminates without a GOAWAY frame, this value is effectively the highest
             stream identifier.
+
+            如果连接在没有超时帧的情况下终止，这个值有效的是最大的流标识符。
           </t>
           <t>
             On streams with lower or equal numbered identifiers that were not closed completely
@@ -2270,25 +2617,35 @@ HTTP2-Settings    = token68
             protocol activity is not possible (with the exception of idempotent actions like HTTP
             GET, PUT, or DELETE).  Any protocol activity that uses higher numbered streams can be
             safely retried using a new connection.
+
+            连接关闭前小于或等于标识符上的流没有完全关闭的，重试请求，交换，或者任何协议活动都是不可能的(例如HTTP GET,PUT,或者删除等等幂行为例外)。任何使用更高的流数值的协议行为可以在新的连接上安全地重试。
           </t>
           <t>
             Activity on streams numbered lower or equal to the last stream identifier might still
             complete successfully.  The sender of a GOAWAY frame might gracefully shut down a
             connection by sending a GOAWAY frame, maintaining the connection in an open state until
             all in-progress streams complete.
+
+            小于或等于最后流标识符上的流的活动可能仍然能成功完成。超时帧的发送端可能通过发送超时帧优雅地关闭了连接，保持连接在打开状态直到正在处理的流全部处理完成。
           </t>
           <t>
             The last stream ID MUST be 0 if no streams were acted upon.
+
+            如果没有流起作用，最后流的ID必须是0。
           </t>
           <t>
             If an endpoint maintains the connection and continues to exchange frames, ignored frames
             MUST be counted toward <xref target="FlowControl">flow control limits</xref> or update
             <xref target="HeaderBlock">header compression state</xref>. Otherwise, flow control or
             header compression state can become unsynchronized.
+
+            如果终端保持了连接并且继续交换帧，忽略的帧必须被计入流量控制限制或者更新报头压缩状态。否则，流量控制或者报头压缩状态可能会不同步。
           </t>
           <t>
             The GOAWAY frame also contains a 32-bit <xref target="ErrorCodes">error code</xref> that
             contains the reason for closing the connection.
+
+            超时帧同样包含一个32位的错误码，里面包含了关闭连接的原因。
           </t>
           <t>
             Endpoints MAY append opaque data to the payload of any GOAWAY frame.  Additional debug
@@ -2296,6 +2653,8 @@ HTTP2-Settings    = token68
             information could contain security- or privacy-sensitive data.  Logged or otherwise
             persistently stored debug data MUST have adequate safeguards to prevent unauthorized
             access.
+
+            终端可以在超时帧载体上附加不透明数据。额外的调试数据仅用来诊断没有语义值。调试信息可以包含安全或者隐私敏感的数据。登录或者其他持续存储的数据必须有足够的保障措施，以防止未经授权的访问。
           </t>
         </section>
 
@@ -2303,16 +2662,22 @@ HTTP2-Settings    = token68
           <t>
             The WINDOW_UPDATE frame (type=0x8) is used to implement flow control; see <xref
             target="FlowControl"/> for an overview.
+
+            WINDOW_UPDATE帧(type=0x8)用来实现流量控制；概述见<xref target="FlowControl"/> 
           </t>
           <t>
             Flow control operates at two levels: on each individual stream and on the entire
             connection.
+
+            流量控制在两种层面上操作：每个单独的流或者整个连接。
           </t>
           <t>
             Both types of flow control are hop by hop; that is, only between the two endpoints.
             Intermediaries do not forward WINDOW_UPDATE frames between dependent connections.
             However, throttling of data transfer by any receiver can indirectly cause the
             propagation of flow control information toward the original sender.
+
+            所有类型的流量控制都是逐跳的；就是说，只在两个终端之间作用。中介者不在依赖的连接上转接WINDOW_UPDATE帧。接收端对数据的显示可以直接导致流量控制信息的传播转到原始发送端。
           </t>
           <t>
             Flow control only applies to frames that are identified as being subject to flow
@@ -2322,6 +2687,8 @@ HTTP2-Settings    = token68
             A receiver MAY respond with a <xref target="StreamErrorHandler">stream error</xref> or
             <xref target="ConnectionErrorHandler">connection error</xref> of type
             <x:ref>FLOW_CONTROL_ERROR</x:ref> if it is unable accept a frame.
+
+            流量控制只适用于确定受流量控制影响的帧。文档中定义的帧类型中，只包括数据帧。不受流量控制的帧必须被接收和处理，除非接收端无法为帧分配资源。接收端如果无法接收帧，可以响应一个流错误或者类型为流量控制错误的连接错误。
           </t>
           <figure title="WINDOW_UPDATE Payload Format">
             <artwork type="inline"><![CDATA[
@@ -2337,20 +2704,28 @@ HTTP2-Settings    = token68
             integer indicating the number of bytes that the sender can transmit in addition to the
             existing flow control window.  The legal range for the increment to the flow control
             window is 1 to 2<x:sup>31</x:sup> - 1 (0x7fffffff) bytes.
+
+            WINDOW_UPDATE帧的载体是一个保留字节，加上一个无符号32为整数表明发送端除了现有的流量控制窗口可以发送的字节数。留空控制窗口有效的增量范围是1到2的31次方-1(0x7fffffff)  字节
           </t>
           <t>
             The WINDOW_UPDATE frame does not define any flags.
+
+            WINDOW_UPDATE帧没有定义任何标记。
           </t>
           <t>
             The WINDOW_UPDATE frame can be specific to a stream or to the entire connection.  In the
             former case, the frame's stream identifier indicates the affected stream; in the latter,
             the value "0" indicates that the entire connection is the subject of the frame.
+
+            WINDOW_UPDATE可以专指某个流或者整个连接。在前者的情况下，帧的流标识符指的是被影响的流；在后者情况下，值"0"表示整个连接都受这个帧的影响。
           </t>
           <t>
             WINDOW_UPDATE can be sent by a peer that has sent a frame bearing the END_STREAM flag.
             This means that a receiver could receive a WINDOW_UPDATE frame on a "half closed
             (remote)" or "closed" stream.  A receiver MUST NOT treat this as an error, see <xref
             target="StreamStates"/>.
+
+            WINDOW_UPDATE可以由一个已经发送带有END_STREAM标记的帧的对等端来发送。这意味着接收端可以在“半封闭(远程)”或者“关闭”的流上接收WINDOW_UPDATE帧。接收端绝对不能作为错误处理，见StreamStates
           </t>
           <t>
             A receiver that receives a flow controlled frame MUST always account for its
@@ -2359,6 +2734,8 @@ HTTP2-Settings    = token68
             even if the frame is in error.  Since the sender counts the frame toward the flow
             control window, if the receiver does not, the flow control window at sender and receiver
             can become different.
+
+            接收端收到受流量控制的帧必须总是计算流量对整个连接流量控制的影响量，除非接收端将这作为连接错误处理。即使帧出错这也是必须的。因为发送端将这个帧计入了流量控制窗口，如果接收端没有这样做，发送端和接收端的流量控制会不相同。
           </t>
 
           <section title="The Flow Control Window">
@@ -2367,6 +2744,8 @@ HTTP2-Settings    = token68
               stream. The flow control window is a simple integer value that indicates how many
               bytes of data the sender is permitted to transmit; as such, its size is a measure of
               the buffering capability of the receiver.
+
+              HTTP/2中流量控制是通过每个发送端在每个流上携带一个窗口来实现的。流量控制窗口是一个简单的整数值，指示发送端被允许传输的字节数；因此，它的大小是接收端的缓存能力的衡量。
             </t>
             <t>
               Two flow control windows are applicable: the stream flow control window and the
@@ -2375,22 +2754,32 @@ HTTP2-Settings    = token68
               advertised by the receiver.  Frames with zero length with the END_STREAM flag set (for
               example, an empty data frame) MAY be sent if there is no available space in either
               flow control window.
+
+              流量控制窗口对流和连接的流量控制窗口都适用。发送端绝对不能发送超出接收端广播的流量控制窗口大小的可用空间长度的受流量控制影响的帧。在各个流量控制窗口中没有可用空间时，可以发送带有END_STREAM标记的长度为0的帧(例如，空数据帧)。
             </t>
             <t>
               For flow control calculations, the 8 byte frame header is not counted.
+
+              流量控制计算中，8字节的帧报头不被计入。
             </t>
             <t>
               After sending a flow controlled frame, the sender reduces the space available in both
               windows by the length of the transmitted frame.
+
+              在发送一个流量控制帧后，发送端在各个窗口中可用空间中减去发送的帧长度。
             </t>
             <t>
               The receiver of a frame sends a WINDOW_UPDATE frame as it consumes data and frees up
               space in flow control windows.  Separate WINDOW_UPDATE frames are sent for the stream
               and connection level flow control windows.
+
+              接收端发送一个WINDOW_UPDATE帧因为它消耗并释放了流量控制窗口的空间。单独的WINDOW_UPDATE帧用于流及连接层面的流量控制窗口中。
             </t>
             <t>
               A sender that receives a WINDOW_UPDATE frame updates the corresponding window by the
               amount specified in the frame.
+
+              发送端收到WINDOW_UPDATE后按帧中指定的大小更新到正确的窗口。
             </t>
             <t>
               A sender MUST NOT allow a flow control window to exceed 2<x:sup>31</x:sup> - 1 bytes.
@@ -2399,12 +2788,16 @@ HTTP2-Settings    = token68
               streams, the sender sends a <x:ref>RST_STREAM</x:ref> with the error code of
               <x:ref>FLOW_CONTROL_ERROR</x:ref> code; for the connection, a <x:ref>GOAWAY</x:ref>
               frame with a <x:ref>FLOW_CONTROL_ERROR</x:ref> code.
+
+              发送端绝对不允许流量控制窗口超过2的31次方-1字节。如果发送端接收到WINDOW_UPDATE使得流量控制窗口超过这个最大值，它必须适当地终止这个流或者这个连接。对于流，发送端发送一个带有流量控制错误的错误码的ST_STREAM帧；对于连接，发送一个带有流量控制错误码的超时帧。
             </t>
             <t>
               Flow controlled frames from the sender and WINDOW_UPDATE frames from the receiver are
               completely asynchronous with respect to each other. This property allows a receiver to
               aggressively update the window size kept by the sender to prevent streams from
               stalling.
+
+              发送端发送的受流量控制的帧以及接收端收到的WINDOW_UPDATE帧是完全异步的并且相互认可对方的值。这种属性让接收端积极的更新发送端携带的窗口大小来防止流停转。
             </t>
           </section>
 
@@ -2416,6 +2809,8 @@ HTTP2-Settings    = token68
               including a value for <x:ref>SETTINGS_INITIAL_WINDOW_SIZE</x:ref> in the
               <x:ref>SETTINGS</x:ref> frame that forms part of the connection preface.  The
               connection flow control window initial size cannot be changed.
+
+              HTTP/2连接初次建立时，新的流创建的初始化流量控制大小是65,535字节。连接的流量控制大小是65,535字节。两个终端都能通过在组成连接序言的设置帧中携带一个SETTINGS_INITIAL_WINDOW_SIZE设置调整新流的初始化窗口大小。连接的流量控制初始化大小不能被修改。
             </t>
             <t>
               Prior to receiving a <x:ref>SETTINGS</x:ref> frame that sets a value for
@@ -2423,6 +2818,8 @@ HTTP2-Settings    = token68
               initial window size when sending flow controlled frames.  Similarly, the connection
               flow control window is set to the default initial window size until a WINDOW_UPDATE
               frame is received.
+
+              在收到设置帧指定SETTINGS_INITIAL_WINDOW_SIZE前，终端只能只有流量控制的默认窗口值。类似的，连接的流量控制窗口初始化时也是默认值知道收到WINDOW_UPDATE帧。
             </t>
             <t>
               A <x:ref>SETTINGS</x:ref> frame can alter the initial flow control window size for all
@@ -2430,18 +2827,24 @@ HTTP2-Settings    = token68
               changes, a receiver MUST adjust the size of all stream flow control windows that it
               maintains by the difference between the new value and the old value.  A
               <x:ref>SETTINGS</x:ref> frame cannot alter the connection flow control window.
+
+              设置帧可以针对所有当前的流修改流量控制初始化大小。当SETTINGS_INITIAL_WINDOW_SIZE值改变时，接收端必须将根据新旧值调整其保留的所有流的窗口大小设置帧不能修改连接的流量控制窗口。
             </t>
             <t>
               An endpoint MUST treat a change to <x:ref>SETTINGS_INITIAL_WINDOW_SIZE</x:ref> that
               causes any flow control window to exceed the maximum size as a <xref
               target="ConnectionErrorHandler">connection error</xref> of type
               <x:ref>FLOW_CONTROL_ERROR</x:ref>.
+
+              终端必须将SETTINGS_INITIAL_WINDOW_SIZE的修改导致流量控制窗口超过最大值的情况作为类型为流量控制错误的连接错误处理。
             </t>
             <t>
               A change to <x:ref>SETTINGS_INITIAL_WINDOW_SIZE</x:ref> can cause the available space
               in a flow control window to become negative.  A sender MUST track the negative flow
               control window, and MUST NOT send new flow controlled frames until it receives
               WINDOW_UPDATE frames that cause the flow control window to become positive.
+
+              SETTINGS_INITIAL_WINDOW_SIZE的改变可能导致流量控制窗口中的可用空间变成负数。发送端必须记录负数的流量控制窗口，并且在收到WINDOW_UPDATE帧使流量控制窗口变成正数前绝对不能发送新的受流量控制的帧。
             </t>
             <t>
               For example, if the client sends 60KB immediately on connection establishment, and the
@@ -2449,6 +2852,8 @@ HTTP2-Settings    = token68
               available flow control window to be -44KB on receipt of the <x:ref>SETTINGS</x:ref>
               frame.  The client retains a negative flow control window until WINDOW_UPDATE frames
               restore the window to being positive, after which the client can resume sending.
+
+              例如，如果终端在当前建立的连接上立即发送了60KB,然后服务器设置初始化窗口大小是16KB,那么客户端在接收到设置帧后计算的流量控制窗口的可用空间就是-44KB。客户端在收到WINDOW_UPDATE帧使得窗口重新变为证书钱一直保留负数的流量控制窗口，在这之后客户端可以重新发送数据。
             </t>
           </section>
 
@@ -2458,18 +2863,26 @@ HTTP2-Settings    = token68
               send a new <x:ref>SETTINGS</x:ref> frame.  However, the receiver MUST be prepared to
               receive data that exceeds this window size, since the sender might send data that
               exceeds the lower limit prior to processing the <x:ref>SETTINGS</x:ref> frame.
+
+              接收端希望使用比当前大小更小的流量控制窗口可以发送一个新的设置帧。然而，接收端必须准备好接收超过窗口大小的数据，因为发送端在处理设置帧之前发送了超过更低限制大小的数据。
             </t>
             <t>
                After sending a SETTINGS frame that reduces the initial flow control window size, a
                receiver has two options for handling streams that exceed flow control limits:
+
+               在发送见效初始化流量控制窗口大小的设置后，接收端有两种选择处理流超过流量限制的情况：
               <list style="numbers">
                 <t>
                   The receiver can immediately send <x:ref>RST_STREAM</x:ref> with
                   <x:ref>FLOW_CONTROL_ERROR</x:ref> error code for the affected streams.
+
+                  接收端可以针对受影响的流立即发送带有流量控制错误错误码的RST_STREAM帧。
                 </t>
                 <t>
                   The receiver can accept the streams and tolerate the resulting head of line
                   blocking, sending WINDOW_UPDATE frames as it consumes data.
+
+                  接收端如果在消耗数据可以接受流并且忍受报头阻塞的结果，并发送WINDOW_UPDATE帧。
                 </t>
               </list>
             </t>
@@ -2483,6 +2896,8 @@ HTTP2-Settings    = token68
             can be sent on an existing stream, as long as the preceding frame on the same stream is
             one of <x:ref>HEADERS</x:ref>, <x:ref>PUSH_PROMISE</x:ref> or CONTINUATION without the
             END_HEADERS flag set.
+
+            延续帧(type=0x9)用来延续一个报头区块碎片序列。在现有流上可以发送任意数量的延续帧，只要相同流上的前一阵是报头帧、推送承诺帧或者不带有END_HEADERS标记的延续帧。
           </t>
 
           <figure title="CONTINUATION Frame Payload">
@@ -2500,29 +2915,41 @@ HTTP2-Settings    = token68
           </figure>
           <t>
             The CONTINUATION frame payload has the following fields:
+
+            延续帧载体有以下字段：
             <list style="hanging">
               <t hangText="Pad High:">
+                填充大小高位。这个字段只有在设置PAD_HIGH标记的情况下才呈现。
                 Padding size high bits.  This field is only present if the PAD_HIGH flag is set.
               </t>
               <t hangText="Pad Low:">
                 Padding size low bits.  This field is only present if the PAD_LOW flag is set.
+
+                填充大小低位。这个字段只有在设置PAD_LOW标记的情况下才呈现。
               </t>
               <t hangText="Header Block Fragment:">
                 A <xref target="HeaderBlock">header block fragment</xref>.
+                报头区块碎片。
               </t>
               <t hangText="Padding:">
                 Padding octets.
+
+                填充字节。
               </t>
             </list>
           </t>
 
           <t>
             The CONTINUATION frame defines the following flags:
+
+            延续帧定义了以下状态：
             <list style="hanging">
               <x:lt hangText="END_HEADERS (0x4):">
                 <t>
                   Bit 3 being set indicates that this frame ends a <xref
                   target="HeaderBlock">header block</xref>.
+
+                  位3表示是报头区块的终止。
                 </t>
                 <t>
                   If the END_HEADERS bit is not set, this frame MUST be followed by another
@@ -2530,11 +2957,15 @@ HTTP2-Settings    = token68
                   or a frame on a different stream as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  如果没有设置END_HEADERS位，那么帧后面必须跟着其他延续帧。接收到收到任何其他类型或者其他流觞的帧必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_LOW (0x10):">
                 <t>
                   Bit 5 being set indicates that the Pad Low field is present.
+
+                  位5表示Pad Low字段已设置。
                 </t>
               </x:lt>
               <x:lt hangText="PAD_HIGH (0x20):">
@@ -2544,6 +2975,8 @@ HTTP2-Settings    = token68
                   PAD_HIGH set and PAD_LOW cleared MUST treat this as a <xref
                   target="ConnectionErrorHandler">connection error</xref> of type
                   <x:ref>PROTOCOL_ERROR</x:ref>.
+
+                  位6表示Pad High字段已设置。这个位绝对不能在没有设置PAD_LOW标记的情况下设置。终端接收到带有PAD_HIGH设置但是不带PAD_LOW设置的必须作为类型为协议错误的连接错误处理。
                 </t>
               </x:lt>
             </list>
@@ -2552,17 +2985,23 @@ HTTP2-Settings    = token68
           <t>
             The payload of a CONTINUATION frame contains a <xref target="HeaderBlock">header block
             fragment</xref>.
+
+            延续帧的载体包含一个报头区块碎片。
           </t>
 
           <t>
             The CONTINUATION frame changes the connection state as defined in <xref
             target="HeaderBlock" />.
+
+            延续帧改变连接状态如HeaderBlock中定义。
           </t>
 
           <t>
             CONTINUATION frames MUST be associated with a stream. If a CONTINUATION frame is
             received whose stream identifier field is 0x0, the recipient MUST respond with a <xref
             target="ConnectionErrorHandler">connection error</xref> of type PROTOCOL_ERROR.
+
+            延续帧必须与流相关联。如果延续帧的相关流表示字段是0x0，终端必须响应一个类型为协议错误的连接错误。
           </t>
 
           <t>
@@ -2571,11 +3010,15 @@ HTTP2-Settings    = token68
             A recipient that observes violation of this rule MUST respond with a
             <xref target="ConnectionErrorHandler"> connection error</xref> of type
             <x:ref>PROTOCOL_ERROR</x:ref>.
+
+            延续帧必须跟在不带有END_HEADERS设置的报头帧、推送承诺帧或延续帧后面。终端接收到不符合此规则的必须响应一个类型为协议错误的连接错误。
           </t>
 
           <t>
             The CONTINUATION frame includes optional padding.  Padding fields and flags are
             identical to those defined for <xref target="DATA">DATA frames</xref>.
+
+            延续帧的填充是可选的。填充字段额标记同数据帧中定义。
           </t>
         </section>
     </section>
@@ -2584,63 +3027,95 @@ HTTP2-Settings    = token68
       <t>
         Error codes are 32-bit fields that are used in <x:ref>RST_STREAM</x:ref> and
         <x:ref>GOAWAY</x:ref> frames to convey the reasons for the stream or connection error.
+
+        错误码是32为字段，用在RST_STREAM和超时帧中用来标识流或者链接错误的原因。
       </t>
 
       <t>
         Error codes share a common code space.  Some error codes only apply to specific conditions
         and have no defined semantics in certain frame types.
+
+        错误码共享一个功能的代码空间。一些错误代码只适用于特定的条件，在某些帧类型没有定义的语义。
       </t>
 
       <t>
         The following error codes are defined:
+
+        定义了以下错误码：
         <list style="hanging">
           <t hangText="NO_ERROR (0):" anchor="NO_ERROR">
             The associated condition is not as a result of an error.  For example, a
             <x:ref>GOAWAY</x:ref> might include this code to indicate graceful shutdown of a
             connection.
+
+            相关的条件并不是错误的结果。例如超时帧可以携带此错误码指示连接的平滑关闭。
           </t>
           <t hangText="PROTOCOL_ERROR (1):" anchor="PROTOCOL_ERROR">
             The endpoint detected an unspecific protocol error.  This error is for use when a more
             specific error code is not available.
+
+            终端检测到一个不确定的协议错误。这个错误用在一个更具体的错误码不可用的时候。
           </t>
           <t hangText="INTERNAL_ERROR (2):" anchor="INTERNAL_ERROR">
             The endpoint encountered an unexpected internal error.
+
+            终端遇到意外的内部错误。
           </t>
           <t hangText="FLOW_CONTROL_ERROR (3):" anchor="FLOW_CONTROL_ERROR">
             The endpoint detected that its peer violated the flow control protocol.
+
+            终端检测到对等端违反了流量控制协议。
           </t>
           <t hangText="SETTINGS_TIMEOUT (4):" anchor="SETTINGS_TIMEOUT">
             The endpoint sent a SETTINGS frame, but did not receive a response in a
             timely manner.  See <xref target="SettingsSync">Settings Synchronization</xref>.
+
+            终端发送了设置帧，但是没有及时收到响应。见Settings Synchronization。
           </t>
           <t hangText="STREAM_CLOSED (5):" anchor="STREAM_CLOSED">
             The endpoint received a frame after a stream was half closed.
+
+            终端在流半封闭的时候收到帧。
           </t>
           <t hangText="FRAME_SIZE_ERROR (6):" anchor="FRAME_SIZE_ERROR">
             The endpoint received a frame that was larger than the maximum size that it
             supports.
+
+            终端收到大小超过最大尺寸的帧。
           </t>
           <t hangText="REFUSED_STREAM (7):" anchor="REFUSED_STREAM">
             The endpoint refuses the stream prior to performing any application processing, see
             <xref target="Reliability"/> for details.
+
+            终端拒绝流执行任何应用处理，详见Reliability
           </t>
           <t hangText="CANCEL (8):" anchor="CANCEL">
             Used by the endpoint to indicate that the stream is no longer needed.
+
+            终端使用这个标示某个流不再需要。
           </t>
           <t hangText="COMPRESSION_ERROR (9):" anchor="COMPRESSION_ERROR">
             The endpoint is unable to maintain the compression context for the connection.
+
+            终端无法保持连接的压缩上下文。
           </t>
           <t hangText="CONNECT_ERROR (10):" anchor="CONNECT_ERROR">
             The connection established in response to a <xref target="CONNECT">CONNECT
             request</xref> was reset or abnormally closed.
+
+            响应某个连接请求建立的连接被服为异常关闭。
           </t>
           <t hangText="ENHANCE_YOUR_CALM (11):" anchor="ENHANCE_YOUR_CALM">
             The endpoint detected that its peer is exhibiting a behavior over a given amount of time
             that has caused it to refuse to process further frames.
+
+            终端检测出对等端在给定时间内表现出行为导致其拒绝处理更多帧。
           </t>
           <t hangText="INADEQUATE_SECURITY (12):" anchor="INADEQUATE_SECURITY">
             The underlying transport has properties that do not meet the minimum requirements
             imposed by this document (see <xref target="TLSUsage"/>) or the endpoint.
+
+            基础传输包含属性不满足文档或者终端申明的最小要求。
           </t>
         </list>
       </t>
@@ -2652,6 +3127,8 @@ HTTP2-Settings    = token68
         that, from the perspective of the server and client applications, the features of the
         protocol are unchanged. To achieve this, all request and response semantics are preserved,
         although the syntax of conveying those semantics has changed.
+
+        HTTP/2的目的是尽可能的就按容目前使用的HTTP。这意味着，从服务端或者客户端应用的角度来看，该协议的特定是不变的。为了实现这点，所有响应与请求的语义都将保留，尽管包含这些语义的语法已经改变。
       </t>
       <t>
         Thus, the specification and requirements of HTTP/1.1 Semantics and Content <xref
@@ -2661,6 +3138,8 @@ HTTP2-Settings    = token68
         and Routing <xref target="HTTP-p1"/>, such as the HTTP and HTTPS URI schemes, are also
         applicable in HTTP/2, but the expression of those semantics for this protocol are defined
         in the sections below.
+
+        因此，HTTP/1.1语义与内容、有条件的请求、范围请求、缓存与验证定义的规范与要求同样适用于HTTP/2.HTTP/1.1消息语法与路由选定的内容，例如HTTP与HTTPS URI方案，也同样适用于HTTP/2，但是表达这些协议的语义在下面的章节定义。
       </t>
 
       <section anchor="HttpSequence" title="HTTP Request/Response Exchange">
@@ -2668,39 +3147,55 @@ HTTP2-Settings    = token68
           A client sends an HTTP request on a new stream, using a previously unused <xref
           target="StreamIdentifiers">stream identifier</xref>.  A server sends an HTTP response on
           the same stream as the request.
+
+          客户端在一个新的流上发起HTTP请求，使用以前未使用的流标示。服务端在同个流上发起HTTP响应。
         </t>
         <t>
           An HTTP message (request or response) consists of:
+          一个HTTP消息(请求或相应)包含：
           <list style="numbers">
             <t>
               one <x:ref>HEADERS</x:ref> frame, followed by zero or more
               <x:ref>CONTINUATION</x:ref> frames (containing the message headers; see <xref
               target="HTTP-p1" x:fmt="," x:rel="#header.fields"/>), and
+
+              一个报头帧，后面跟着0个或多个延续帧(包含消息报头;见xx),以及
             </t>
             <t>
               zero or more <x:ref>DATA</x:ref> frames (containing the message payload; see <xref
               target="HTTP-p1" x:fmt="," x:rel="#message.body"/>), and
+
+              0个或多个数据帧(包含消息载荷，见),以及
             </t>
             <t>
               optionally, one <x:ref>HEADERS</x:ref> frame, followed by zero or more
               <x:ref>CONTINUATION</x:ref> frames (containing the trailer-part, if present; see
               <xref target="HTTP-p1" x:fmt="," x:rel="#chunked.trailer.part"/>).
+
+              一个可选的吧哦哦图真，后面跟着0个或多个延续帧(如果存在，包含尾部部分，见xxx)
+
             </t>
           </list>
           The last frame in the sequence bears an END_STREAM flag, though a <x:ref>HEADERS</x:ref>
           frame bearing the END_STREAM flag can be followed by <x:ref>CONTINUATION</x:ref> frames
           that carry any remaining portions of the header block.
+
+          序列中的最后一帧具有END_STREAM标记，但是包含END_STREAM标记的报头帧后面可以跟着包含任意报头部分的延续帧。
         </t>
         <t>
           Other frames (from any stream) MUST NOT occur between either <x:ref>HEADERS</x:ref> frame
           and the following <x:ref>CONTINUATION</x:ref> frames (if present), nor between
           <x:ref>CONTINUATION</x:ref> frames.
+
+          其他帧(来自任何流的)绝对不能出现在任意报头帧和延续帧(如果存在)之间,也不能出现在延续帧中间。
         </t>
         <t>
           Otherwise, frames MAY be interspersed on the stream between these frames, but those
           frames do not carry HTTP semantics. In particular, <x:ref>HEADERS</x:ref> frames (and any
           <x:ref>CONTINUATION</x:ref> frames that follow) other than the first and optional last
           frames in this sequence do not carry HTTP semantics.
+
+          否则，流上的这些帧可能被打散，但是那些帧并不包含HTTP语义。特别是，报头帧(及任何跟在后面的延续帧)序列中第一帧及可选的最后一帧以外的并不包含HTTP语义。
         </t>
 
         <t>
@@ -2709,6 +3204,8 @@ HTTP2-Settings    = token68
           <x:ref>CONTINUATION</x:ref> frames, where the <x:ref>HEADERS</x:ref> frame bears an
           END_STREAM flag.  Header blocks after the first that do not terminate the stream are not
           part of an HTTP request or response.
+
+          报头区块中的报头尾部字段同样终止流。就是说，一个报头帧开始的序列，后面跟着0个或者多个带有END_STREAM标记的延续帧。第一个不终止流后面的报头区块不是当前HTTP请求与响应的一部分。
         </t>
 
         <t>
@@ -2718,12 +3215,16 @@ HTTP2-Settings    = token68
           A response starts with a <x:ref>HEADERS</x:ref> frame and ends with a frame bearing
           END_STREAM, optionally followed by <x:ref>CONTINUATION</x:ref> frames, which places the
           stream in the "closed" state.
+
+          一个HTTP 请求/响应的数据交换在同一个流上进行。一个请求由是流进入打开状态的报头帧开始，并由一个携带使流对客户端进入半封闭的END_STREAM标记的帧结束，另外可选的后面可以跟着延续帧，使流进入关闭状态。
         </t>
 
         <section anchor="informational-responses" title="Informational Responses">
           <t>
             The 1xx series of HTTP response status codes (<xref target="HTTP-p2" x:fmt=","
             x:rel="#status.1xx"/>) are not supported in HTTP/2.
+
+            1xx系列的HTTP响应状态码在HTTP/2中不支持。
           </t>
           <t>
             The most common use case for 1xx is using an Expect header field with a <spanx
@@ -2731,32 +3232,44 @@ HTTP2-Settings    = token68
             that the client expects a 100 (Continue) non-final response status code, receipt of
             which indicates that the client should continue sending the request body if it has not
             already done so.
+
+            1xx最常见的用法是使用一个带有100-继续临牌(通俗的，“期待/继续”)的期望报头字段来表明客户端期望一个100(继续)非最终响应的状态码，收到这个表示客户端如果没有发送完应当继续发送请求正文。
           </t>
           <t>
             Typically, Expect/continue is used by clients wishing to avoid sending a large amount
             of data in a request body, only to have the request rejected by the origin server (thus
             leaving the connection potentially unusable).
+
+            通常来说，期望/继续帧被客户端用来希望避免在请求正文中发送大量数据，只用来让请求被源服务器拒绝(因此让连接可能不可用).
           </t>
           <t>
             HTTP/2 does not enable the Expect/continue mechanism; if the server sends a final status
             code to reject the request, it can do so without making the underlying connection
             unusable.
+
+            HTTP/2不支持期望/继续机制；如果服务端发送一个最终状态码来拒绝请求，它可以在不需要使当前连接不可用的情况下做到这个。
           </t>
           <t>
             Note that this means HTTP/2 clients sending requests with bodies may waste at least one
             round trip of sent data when the request is rejected. This can be mitigated by
             restricting the amount of data sent for the first round trip by bandwidth-constrained
             clients, in anticipation of a final status code.
+
+            需要注意的是这意味着，HTTP/2客户端发送带有请求正文的请求在连接被拒绝时可能浪费至少一个发送数据的RTT时间。这可以通过限制带宽受限的客户端第一个RTT的数据大小来缓和，通过预期的最终状态码实现。
           </t>
           <t>
             Other defined 1xx status codes are not applicable to HTTP/2. For example, the semantics
             of 101 (Switching Protocols) aren't suitable to a multiplexed protocol. Likewise, 102
             (Processing) is no longer necessary, because HTTP/2 has a separate means of keeping the
             connection alive.
+
+            其他定义的1xx状态码也不适用于HTTP/2。例如，101(转换协议)的语义不适用于多路复用协议。同样的，102(处理中)也不在需要，因为HTTP/2有单独的保持连接可用的方式。
           </t>
           <t>
             This difference between protocol versions necessitates special handling by
             intermediaries that translate between them:
+
+            这些不同协议版本之间的差异需要被中介端在转换时特殊处理：
             <list style="symbols">
               <t>
                 An intermediary that gateways HTTP/1.1 to HTTP/2 MUST generate a 100 (Continue)
@@ -2765,16 +3278,22 @@ HTTP2-Settings    = token68
                 x:rel="#header.expect"/>), unless it can immediately generate a final status code.
                 It MUST NOT forward the <spanx style="verb">100-continue</spanx> expectation in the
                 request header fields.
+
+                转换HTTP/1.1到HTTP/2的中介网关如果收到请求包含带有100-继续令牌的期望报头字段，必须生成一个100(继续)响应，除非它能马上生成一个最终状态码。绝对不能转发请求报头中的100-继续期望字段。
               </t>
               <t>
                 An intermediary that gateways HTTP/2 to HTTP/1.1 MAY add an Expect header field with
                 a <spanx style="verb">100-continue</spanx> expectation when forwarding a request
                 that has a body; see <xref target="HTTP-p2" x:fmt="," x:rel="#header.expect"/> for
                 specific requirements.
+
+                转换HTTP/2到HTTP/1.1的中介网关在转发一个带有正文的请求时可以添加一个带有100-继续的期望报头字段。特定要求见xxx.
               </t>
               <t>
                 An intermediary that gateways HTTP/2 to HTTP/1.1 MUST discard all other 1xx
                 informational responses.
+
+                转换HTTP/2到HTTP/1.1的中介网关必须丢弃所有1xx以外的响应信息。
               </t>
             </list>
           </t>
@@ -2785,6 +3304,8 @@ HTTP2-Settings    = token68
           <t>
             This section shows HTTP/1.1 requests and responses, with illustrations of equivalent
             HTTP/2 requests and responses.
+
+            这个部分介绍了HTTP/1.1的请求与响应，并带有HTTP/2请求与响应的插图。
           </t>
           <t>
             An HTTP GET request includes request header fields and no body and is therefore
@@ -2792,6 +3313,9 @@ HTTP2-Settings    = token68
             <x:ref>CONTINUATION</x:ref> frames containing the serialized block of request header
             fields.  The last <x:ref>HEADERS</x:ref> frame in the sequence has both the END_HEADERS
             and END_STREAM flags set:
+
+            一个带有请求报头字段但没有正文的HTTP GET请求将被转换成一个单独的报头帧，后面跟着0个或者多个包含序列化的报头字段区块的延续帧。序列中最后一个报头帧将有END_HEADERS和END_STREAM标记。
+
           </t>
 
           <figure>
@@ -2813,6 +3337,8 @@ HTTP2-Settings    = token68
             <x:ref>CONTINUATION</x:ref> frames) containing the serialized block of response header
             fields. The last <x:ref>HEADERS</x:ref> frame in the sequence has both the END_HEADERS
             and END_STREAM flag set:
+
+            相似的，只带有报头字段的响应将被转换成一个报头帧(同样的，后面跟着0个护着多个延续帧)，且包含序列化的响应报头字段区块。序列中最后一个报头帧将有END_HEADERS和END_STREAM标记。
           </t>
 
           <figure>
@@ -2833,6 +3359,8 @@ HTTP2-Settings    = token68
             one or more <x:ref>DATA</x:ref> frames, with the last <x:ref>CONTINUATION</x:ref> (or
             <x:ref>HEADERS</x:ref>) frame having the END_HEADERS flag set and the final
             <x:ref>DATA</x:ref> frame having the END_STREAM flag set:
+
+            带有报头和载荷数据的POST HTTP请求将被转换成一个报头帧，后面跟着一个或者多个带有请求报头字段的延续帧，同时后面跟着一个或者多个数据帧。延续帧或者报头帧的最后一帧有END_HEADERS标记，最后一个数据帧拥有END_STREAM标记。
           </t>
 
           <figure>
@@ -2858,6 +3386,8 @@ HTTP2-Settings    = token68
             <x:ref>HEADERS</x:ref> frame, followed by zero or more <x:ref>CONTINUATION</x:ref> frames,
             followed by one or more <x:ref>DATA</x:ref> frames, with
             the last <x:ref>DATA</x:ref> frame in the sequence having the END_STREAM flag set:
+
+            带有报头字段及载荷数据的响应将被转换成一个报头帧，后面跟着0个或多个延续帧，另外后面跟着一个或多个数据帧，序列中的最后一个数据帧拥有END_STREAM标记。
           </t>
 
           <figure>
@@ -2880,6 +3410,8 @@ HTTP2-Settings    = token68
             header block and all the <x:ref>DATA</x:ref> frames have been sent.  The sequence of
             <x:ref>HEADERS</x:ref>/<x:ref>CONTINUATION</x:ref> frames that bears the trailers
             includes a terminal frame that has both END_HEADERS and END_STREAM flags set.
+
+            所有的请求或者响应报头区块以及所有的数据帧发送之后，尾报头字段作为一个报头区块发送。带有尾部的报头/延续帧序列包含一个带有END_HEADERS及END_STREAM标记的终止帧。
           </t>
 
           <figure>
@@ -2909,24 +3441,33 @@ HTTP2-Settings    = token68
           HTTP header fields carry information as a series of key-value pairs. For a listing of
           registered HTTP headers, see the Message Header Field Registry maintained at
           <eref target="http://www.iana.org/assignments/message-headers"/>.
+
+          HTTP报头字段以一系列键值对的形式携带信息。指定的报头字段列表，见xx中维护的消息报头字段注册表。
         </t>
         <t>
           While HTTP/1.x used the message start-line (see <xref target="HTTP-p1" x:fmt=","
                 x:rel="#start.line"/>) to convey the target URI and method of
           the request, and the status code for the response, HTTP/2 uses special pseudo-headers
           beginning with ":" for these tasks.
+
+          HTTP/1.x使用消息开始线(见xxx)来传达目标URI、请求的方法及相应状态码。但HTTP/2使用特殊的以":"开始的伪头部来实现这些任务。
         </t>
         <t>
           Just as in HTTP/1.x, header field names are strings of ASCII characters that are compared
           in a case-insensitive fashion. However, header field names MUST be converted to lowercase
           prior to their encoding in HTTP/2. A request or response containing uppercase header
           field names MUST be treated as <xref target="malformed">malformed</xref>.
+
+          正如HTTP/1.x中，报头字段名称是ASCII字符，且不区分大小写。然而，HTTP/2中报头字段名称必须转成使用同样编码的小写字符。带有大写报头字段的请求或者响应必须被认为是不规范的。
         </t>
         <t>
           HTTP/2 does not use the Connection header field to indicate "hop-by-hop" header fields;
           in this protocol, connection-specific metadata is conveyed by other means. As such, a
           HTTP/2 message containing Connection MUST be treated as <xref
           target="malformed">malformed</xref>.
+
+          HTTP/2不使用连接报头字段来指示“逐跳”的报头字段；在该协议中，连接特定的元数据是通过其他手段传输的。因此，包含连接的HTTP/2消息必须被认为是不规范的。
+
         </t>
         <t>
           This means that an intermediary transforming an HTTP/1.x message to
@@ -2934,10 +3475,14 @@ HTTP2-Settings    = token68
           along with the Connection header field itself. Such intermediaries SHOULD also remove
           other connection-specific header fields, such as Keep-Alive, Proxy-Connection,
           Transfer-Encoding and Upgrade, even if they are not nominated by Connection.
+
+          这意味着中介端转换一个HTTP/1.x消息到HTTP/2需要移除由连接报头字段指定的任何报头字段，包含连接报头字段本身。这样的中介端同样应当移除其他连接特定的报头字段，例如Keep-Alive、Proxy-Connection、Transfer-Encoding和Upgrade，即便它们不是由连接指定的。
         </t>
         <t>
           One exception to this is the TE header field, which MAY be present in an HTTP/2 request,
           but when it is MUST NOT contain any value other than "trailers".
+
+          一个例外是TE报头字段，这个可能在 HTTP/2 请求中保留，但是它不能包含“trailers”以外的值。
         </t>
         <t>
           <list style="hanging">
@@ -2945,6 +3490,8 @@ HTTP2-Settings    = token68
               HTTP/2 purposefully does not support upgrade to another protocol.  The
               handshake methods described in <xref target="starting"/> are believed sufficient to
               negotiate the use of alternative protocols.
+
+              HTTP/2不支持升级到其他协议。3章节中描述的握手协议被认为足够用来作为替代协议使用。
             </t>
           </list>
         </t>
@@ -2953,17 +3500,21 @@ HTTP2-Settings    = token68
           <t>
             HTTP/2 defines a number of header fields starting with a colon ':' character that carry
             information about the request target:
+
+            HTTP/2定义了一个以字符“:”开头的报头域，包含目标请求的信息：
             <list style="symbols">
               <x:lt>
                 <t>
                   The <spanx style="verb">:method</spanx> header field includes the HTTP method
                   (<xref target="HTTP-p2" x:fmt="," x:rel="#methods"/>).
+                  :method 报头字段包含了HTTP方法
                 </t>
               </x:lt>
               <x:lt>
                 <t>
                   The <spanx style="verb">:scheme</spanx> header field includes the scheme portion
                   of the target URI (<xref target="RFC3986" x:fmt="," x:sec="3.1"/>).
+                  :scheme字段包含了目标URI方案部分。
                 </t>
               </x:lt>
               <x:lt>
@@ -2973,6 +3524,8 @@ HTTP2-Settings    = token68
                   authority MUST NOT include the deprecated <spanx style="verb">userinfo</spanx>
                   subcomponent for <spanx style="verb">http:</spanx> or <spanx
                   style="verb">https:</spanx> URIs.
+
+                  :authority报头字段包含了目标URI的权限部分。这个权限绝对不能包含http:或者https: URIs的废弃的用户信息子成份。
                 </t>
                 <t>
                   To ensure that the HTTP/1.1 request line can be reproduced accurately, this
