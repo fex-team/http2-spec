@@ -48,7 +48,7 @@
 
 <xsl:strip-space elements="abstract author back figure front list middle note postal reference references rfc section texttable"/>
 
-<xsl:output method="html" encoding="iso-8859-1" version="4.0" doctype-public="-//W3C//DTD HTML 4.01//EN" indent="no"/>
+<xsl:output method="html" encoding="utf-8" version="4.0" doctype-public="-//W3C//DTD HTML 4.01//EN" indent="no"/>
 
 <!-- rfc comments PI -->
 
