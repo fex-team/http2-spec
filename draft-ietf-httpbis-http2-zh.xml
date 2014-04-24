@@ -1110,10 +1110,10 @@ HTTP2-Settings    = token68
                 <vspace blankLines="0"/>
                 A stream in the "open" state may be used by both peers to send frames of any type.
                 In this state, sending peers observe advertised <xref target="FlowControl">stream
-                level flow control limits
+                level flow control limits</xref>.
 
                 处于“打开”状态的流可以被两个对等端来发送任何类型的帧。在这种状态下，发送数据的对等端检查被广播端<xref target="FlowControl">流量控制限制。
-                </xref>.
+                </xref>
               </t>
               <t>
                 From this state either endpoint can send a frame with an END_STREAM flag set, which
